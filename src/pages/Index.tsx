@@ -6,6 +6,7 @@ import VideoPreview from '@/components/VideoPreview';
 import DownloadOptions from '@/components/DownloadOptions';
 import Footer from '@/components/Footer';
 import { Zap } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Define video info type
 interface VideoInfo {
@@ -17,6 +18,7 @@ interface VideoInfo {
 }
 
 const Index = () => {
+  const { t } = useLanguage();
   const [videoInfo, setVideoInfo] = useState<VideoInfo | null>(null);
 
   const handleLinkSubmit = (url: string) => {
@@ -44,7 +46,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-flash-50 to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-flash-50 to-white dark:from-flash-900 dark:to-flash-950">
       <Header />
       
       <main className="flex-grow container mx-auto px-4 py-8">
@@ -54,11 +56,11 @@ const Index = () => {
               <Zap className="h-8 w-8 animate-flash" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-flash-800">
-            Flash Converter
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-flash-800 dark:text-flash-300">
+            {t('app_name')}
           </h1>
-          <p className="text-lg text-flash-700 max-w-xl mx-auto">
-            Download YouTube videos and playlists as MP3 or MP4 quickly and easily
+          <p className="text-lg text-flash-700 dark:text-flash-400 max-w-xl mx-auto">
+            {t('paste_link')}
           </p>
         </div>
         
