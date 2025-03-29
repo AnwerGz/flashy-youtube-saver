@@ -1,0 +1,114 @@
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileAudio, FileVideo, FolderOpen, Download } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface DownloadOptionsProps {
+  isVisible: boolean;
+  isPlaylist: boolean;
+}
+
+const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist }) => {
+  const [selectedFormat, setSelectedFormat] = useState('mp3');
+  const [outputPath, setOutputPath] = useState('Downloads/FlashConverter');
+  const [isDownloading, setIsDownloading] = useState(false);
+  
+  if (!isVisible) return null;
+
+  const handleChooseLocation = () => {
+    // In a real app, this would trigger a file system dialog
+    // For this demo, we'll simulate it with a toast
+    toast.success("Output folder selected: Downloads/FlashConverter");
+    setOutputPath('Downloads/FlashConverter');
+  };
+
+  const handleDownload = () => {
+    setIsDownloading(true);
+    
+    // Simulate download process
+    toast.info(`Starting download as ${selectedFormat.toUpperCase()}...`);
+    
+    setTimeout(() => {
+      toast.success(`Download completed! Saved to ${outputPath}`);
+      setIsDownloading(false);
+    }, 3000);
+  };
+
+  return (
+    <Card className="border-flash-200 shadow-md w-full max-w-3xl mx-auto">
+      <CardContent className="p-6">
+        <h3 className="text-lg font-bold mb-4">Download Options</h3>
+        
+        <Tabs defaultValue="mp3" onValueChange={setSelectedFormat} className="w-full">
+          <TabsList className="grid grid-cols-2 mb-4">
+            <TabsTrigger value="mp3" className="flex items-center gap-2 data-[state=active]:bg-flash-500 data-[state=active]:text-white">
+              <FileAudio className="h-4 w-4" />
+              <span>Audio (MP3)</span>
+            </TabsTrigger>
+            <TabsTrigger value="mp4" className="flex items-center gap-2 data-[state=active]:bg-flash-500 data-[state=active]:text-white">
+              <FileVideo className="h-4 w-4" />
+              <span>Video (MP4)</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="mp3" className="mt-0">
+            <div className="text-sm text-muted-foreground mb-4">
+              Extract audio from the video in MP3 format with high quality.
+              {isPlaylist && " All videos in the playlist will be converted to MP3."}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="mp4" className="mt-0">
+            <div className="text-sm text-muted-foreground mb-4">
+              Download video in MP4 format with original quality.
+              {isPlaylist && " All videos in the playlist will be downloaded as MP4."}
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        <div className="flex flex-col gap-4 mt-4">
+          <div>
+            <label className="text-sm font-medium mb-1 block">Output Location</label>
+            <div className="flex items-center gap-2">
+              <div className="flex-grow bg-muted p-2 rounded text-sm truncate">
+                {outputPath}
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleChooseLocation}
+                className="border-flash-300 hover:bg-flash-50"
+              >
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Browse
+              </Button>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={handleDownload} 
+            disabled={isDownloading}
+            className="w-full bg-flash-500 hover:bg-flash-600 text-white mt-2"
+          >
+            {isDownloading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Downloading...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                <span>Download {selectedFormat.toUpperCase()}</span>
+              </div>
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default DownloadOptions;
