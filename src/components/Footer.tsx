@@ -93,7 +93,7 @@ const Footer = () => {
         <div className="mb-6">
           <h2 className="text-xl font-bold mb-4 text-center text-flash-800">Meet the Developers</h2>
           <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex space-x-4 pb-4">
+            <div className="flex justify-center space-x-4 pb-4">
               {developers.map((developer) => (
                 <DeveloperCard key={developer.name} developer={developer} />
               ))}
