@@ -11,7 +11,7 @@ const Header = () => {
             <img 
               src="https://raw.githubusercontent.com/DeJavi08/YTPlaylist-DW/refs/heads/program/thunder.png" 
               alt="Flash Converter" 
-              className="h-10 w-10"
+              className="h-10 w-10 rounded-xl"
             />
           </div>
           <div className="font-bold text-2xl text-flash-600 tracking-tight">

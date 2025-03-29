@@ -3,8 +3,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileAudio, FileVideo, FolderOpen, Download } from 'lucide-react';
+import { FileAudio, FileVideo, FolderOpen, Download, Settings } from 'lucide-react';
 import { toast } from 'sonner';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface DownloadOptionsProps {
   isVisible: boolean;
@@ -15,6 +18,11 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
   const [selectedFormat, setSelectedFormat] = useState('mp3');
   const [outputPath, setOutputPath] = useState('Downloads/FlashConverter');
   const [isDownloading, setIsDownloading] = useState(false);
+  
+  // Quality settings
+  const [mp3Quality, setMp3Quality] = useState("192");
+  const [mp4Quality, setMp4Quality] = useState("720");
+  const [mp3VBR, setMp3VBR] = useState(false);
   
   if (!isVisible) return null;
 
@@ -29,7 +37,11 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
     setIsDownloading(true);
     
     // Simulate download process
-    toast.info(`Starting download as ${selectedFormat.toUpperCase()}...`);
+    const formatLabel = selectedFormat === 'mp3' 
+      ? `MP3 (${mp3Quality}kbps${mp3VBR ? ' VBR' : ''})`
+      : `MP4 (${mp4Quality}p)`;
+      
+    toast.info(`Starting download as ${formatLabel}...`);
     
     setTimeout(() => {
       toast.success(`Download completed! Saved to ${outputPath}`);
@@ -54,17 +66,66 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="mp3" className="mt-0">
+          <TabsContent value="mp3" className="mt-0 space-y-4">
             <div className="text-sm text-muted-foreground mb-4">
               Extract audio from the video in MP3 format with high quality.
               {isPlaylist && " All videos in the playlist will be converted to MP3."}
             </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Audio Quality</label>
+                  <span className="text-sm font-medium">{mp3Quality} kbps</span>
+                </div>
+                <Select value={mp3Quality} onValueChange={setMp3Quality}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select quality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="128">128 kbps</SelectItem>
+                    <SelectItem value="192">192 kbps</SelectItem>
+                    <SelectItem value="256">256 kbps</SelectItem>
+                    <SelectItem value="320">320 kbps (Best)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Variable Bit Rate (VBR)</label>
+                <Switch 
+                  checked={mp3VBR} 
+                  onCheckedChange={setMp3VBR} 
+                  className="data-[state=checked]:bg-flash-500"
+                />
+              </div>
+            </div>
           </TabsContent>
           
-          <TabsContent value="mp4" className="mt-0">
+          <TabsContent value="mp4" className="mt-0 space-y-4">
             <div className="text-sm text-muted-foreground mb-4">
-              Download video in MP4 format with original quality.
+              Download video in MP4 format with selected quality.
               {isPlaylist && " All videos in the playlist will be downloaded as MP4."}
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Video Quality</label>
+                <span className="text-sm font-medium">{mp4Quality}p</span>
+              </div>
+              <Select value={mp4Quality} onValueChange={setMp4Quality}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select quality" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="360">360p</SelectItem>
+                  <SelectItem value="480">480p</SelectItem>
+                  <SelectItem value="720">720p (HD)</SelectItem>
+                  <SelectItem value="1080">1080p (Full HD)</SelectItem>
+                  <SelectItem value="1440">1440p (2K)</SelectItem>
+                  <SelectItem value="2160">2160p (4K)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </TabsContent>
         </Tabs>
