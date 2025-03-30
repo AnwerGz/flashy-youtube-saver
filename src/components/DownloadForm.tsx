@@ -4,37 +4,50 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { getVideoInfo } from '@/utils/ytdlp';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface DownloadFormProps {
-  onLinkSubmit: (url: string) => void;
+  onLinkSubmit: (url: string, videoInfo: any) => void;
 }
 
 const DownloadForm: React.FC<DownloadFormProps> = ({ onLinkSubmit }) => {
+  const { t } = useLanguage();
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!youtubeUrl) {
-      toast.error('Please enter a YouTube URL');
+      toast.error(t('enter_url'));
       return;
     }
 
     const isValidYoutubeUrl = youtubeUrl.includes('youtube.com') || youtubeUrl.includes('youtu.be');
     
     if (!isValidYoutubeUrl) {
-      toast.error('Please enter a valid YouTube URL');
+      toast.error(t('invalid_url'));
       return;
     }
 
     setIsLoading(true);
     
-    // Simulate getting video info (in a real app, this would call an API)
-    setTimeout(() => {
-      onLinkSubmit(youtubeUrl);
+    try {
+      // Get video info from yt-dlp
+      const videoInfo = await getVideoInfo(youtubeUrl);
+      
+      if (videoInfo) {
+        onLinkSubmit(youtubeUrl, videoInfo);
+      } else {
+        toast.error(t('video_info_failed'));
+      }
+    } catch (error) {
+      console.error("Error fetching video info:", error);
+      toast.error(t('video_info_failed'));
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -46,8 +59,8 @@ const DownloadForm: React.FC<DownloadFormProps> = ({ onLinkSubmit }) => {
             type="text"
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
-            placeholder="Paste YouTube URL here (video or playlist)"
-            className="pl-9 py-6 bg-white border-flash-200 focus-visible:ring-flash-500"
+            placeholder={t('paste_link')}
+            className="pl-9 py-6 bg-white border-flash-200 focus-visible:ring-flash-500 dark:bg-flash-950 dark:border-flash-800"
           />
         </div>
         <Button 
@@ -58,12 +71,12 @@ const DownloadForm: React.FC<DownloadFormProps> = ({ onLinkSubmit }) => {
           {isLoading ? (
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Processing...</span>
+              <span>{t('processing')}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Download className="h-4 w-4" />
-              <span>Analyze</span>
+              <span>{t('analyze')}</span>
             </div>
           )}
         </Button>

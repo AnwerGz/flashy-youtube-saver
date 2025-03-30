@@ -20,27 +20,25 @@ interface VideoInfo {
 const Index = () => {
   const { t } = useLanguage();
   const [videoInfo, setVideoInfo] = useState<VideoInfo | null>(null);
+  const [currentUrl, setCurrentUrl] = useState<string>('');
 
-  const handleLinkSubmit = (url: string) => {
-    // In a real app, this would make an API call to get video info
-    // For this demo, we'll simulate the response
+  const handleLinkSubmit = (url: string, videoInfoData: any) => {
+    // Process the video info from yt-dlp
+    setCurrentUrl(url);
     
-    // Check if it's a playlist (contains "list=" in the URL)
-    const isPlaylist = url.includes('list=');
-    
-    if (isPlaylist) {
+    if (videoInfoData.isPlaylist) {
       setVideoInfo({
         type: 'playlist',
-        title: 'Sample YouTube Playlist - Best Songs Collection',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        videoCount: 25
+        title: videoInfoData.playlistTitle || 'YouTube Playlist',
+        thumbnail: videoInfoData.thumbnail || 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+        videoCount: videoInfoData.playlistCount || videoInfoData.playlistItems?.length || 0
       });
     } else {
       setVideoInfo({
         type: 'video',
-        title: 'Sample YouTube Video - Amazing Content',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        duration: '3:45'
+        title: videoInfoData.title || 'YouTube Video',
+        thumbnail: videoInfoData.thumbnail || 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+        duration: videoInfoData.duration || '0:00'
       });
     }
   };
@@ -70,7 +68,11 @@ const Index = () => {
           {videoInfo && (
             <div className="space-y-6 animate-fade-in">
               <VideoPreview videoInfo={videoInfo} />
-              <DownloadOptions isVisible={!!videoInfo} isPlaylist={videoInfo?.type === 'playlist'} />
+              <DownloadOptions 
+                isVisible={!!videoInfo} 
+                isPlaylist={videoInfo?.type === 'playlist'} 
+                url={currentUrl}
+              />
             </div>
           )}
         </div>

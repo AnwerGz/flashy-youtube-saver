@@ -14,11 +14,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     // Check if theme is stored in localStorage
     const savedTheme = localStorage.getItem("theme");
-    // Check system preference if no saved theme
+    // Default to light mode
     if (!savedTheme) {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+      return "light";
     }
     return (savedTheme as Theme) || "light";
   });

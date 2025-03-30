@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, ListMusic, Youtube } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface VideoPreviewProps {
   videoInfo: {
@@ -14,10 +15,12 @@ interface VideoPreviewProps {
 }
 
 const VideoPreview: React.FC<VideoPreviewProps> = ({ videoInfo }) => {
+  const { t } = useLanguage();
+  
   if (!videoInfo) return null;
 
   return (
-    <Card className="w-full overflow-hidden border-flash-200 shadow-md">
+    <Card className="w-full overflow-hidden border-flash-200 shadow-md dark:border-flash-800 dark:bg-flash-900">
       <CardContent className="p-0">
         {videoInfo.type === 'video' ? (
           <div className="flex flex-col md:flex-row">
@@ -36,14 +39,14 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({ videoInfo }) => {
             </div>
             <div className="p-4 flex flex-col justify-between">
               <div>
-                <div className="text-sm text-flash-600 font-medium flex items-center gap-1 mb-1">
+                <div className="text-sm text-flash-600 dark:text-flash-300 font-medium flex items-center gap-1 mb-1">
                   <Youtube className="h-4 w-4" />
-                  <span>YouTube Video</span>
+                  <span>{t('youtube_video')}</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 line-clamp-2">{videoInfo.title}</h3>
               </div>
               <div className="text-sm text-muted-foreground">
-                Ready to download. Choose your format below.
+                {t('ready_to_download')}
               </div>
             </div>
           </div>
@@ -58,20 +61,20 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({ videoInfo }) => {
               {videoInfo.videoCount && (
                 <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1 py-0.5 rounded flex items-center gap-1">
                   <ListMusic className="h-3 w-3" />
-                  <span>{videoInfo.videoCount} videos</span>
+                  <span>{videoInfo.videoCount} {t('videos')}</span>
                 </div>
               )}
             </div>
             <div className="p-4 flex flex-col justify-between">
               <div>
-                <div className="text-sm text-flash-600 font-medium flex items-center gap-1 mb-1">
+                <div className="text-sm text-flash-600 dark:text-flash-300 font-medium flex items-center gap-1 mb-1">
                   <ListMusic className="h-4 w-4" />
-                  <span>YouTube Playlist</span>
+                  <span>{t('youtube_playlist')}</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 line-clamp-2">{videoInfo.title}</h3>
               </div>
               <div className="text-sm text-muted-foreground">
-                {videoInfo.videoCount} videos in this playlist. All videos will be processed.
+                {videoInfo.videoCount} {t('videos_in_playlist')}
               </div>
             </div>
           </div>
