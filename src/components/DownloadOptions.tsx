@@ -4,12 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from '@/context/LanguageContext';
 import { Folder } from "lucide-react";
+import { downloadVideo } from '@/utils/ytdlp';
 
-// Fix the type of props
 interface DownloadOptionsProps {
   isVisible: boolean;
   isPlaylist: boolean;
@@ -21,6 +20,8 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
   const [format, setFormat] = useState<string>('mp3');
   const [quality, setQuality] = useState<string>(format === 'mp3' ? '192kbps' : '720p');
   const [outputPath, setOutputPath] = useState<string>('');
+  const [downloadProgress, setDownloadProgress] = useState<number>(0);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const handleFormatChange = (value: string) => {
     setFormat(value);
@@ -94,18 +95,39 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
     }
 
     try {
+      setIsDownloading(true);
+      setDownloadProgress(0);
+      
       toast({
         title: "Download started",
         description: `Downloading ${isPlaylist ? 'playlist' : 'video'} in ${format.toUpperCase()} format at ${quality} quality`
       });
 
-      // Simulate download process
-      setTimeout(() => {
+      // Start the download process with progress tracking
+      const isAudio = format === 'mp3';
+      const success = await downloadVideo(
+        url,
+        format,
+        outputPath,
+        quality,
+        isAudio,
+        (progress) => {
+          setDownloadProgress(progress);
+        }
+      );
+
+      if (success) {
         toast({
           title: "Download complete",
           description: `Your ${isPlaylist ? 'playlist' : 'video'} has been saved to ${outputPath}`,
         });
-      }, 3000);
+      } else {
+        toast({
+          title: "Download failed",
+          description: "An error occurred during the download process",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('Error during download:', error);
       toast({
@@ -113,6 +135,8 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
         description: "An error occurred during the download process",
         variant: "destructive"
       });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -181,13 +205,37 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
           </div>
         </div>
 
+        {/* Progress indicator shown when downloading */}
+        {isDownloading && (
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Label>Download Progress</Label>
+              <span className="text-sm font-medium">{downloadProgress}%</span>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-flash-500" 
+                style={{ width: `${downloadProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
         {/* Download Button */}
         <Button
           variant="default"
           className="w-full flash-gradient hover:opacity-90 transition-opacity"
           onClick={handleDownload}
+          disabled={isDownloading}
         >
-          {t('download')}
+          {isDownloading ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>{t('downloading')}</span>
+            </div>
+          ) : (
+            t('download')
+          )}
         </Button>
       </div>
     </div>
