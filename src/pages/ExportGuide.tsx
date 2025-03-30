@@ -1,571 +1,224 @@
-
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Check, Info, FileCode, Package, Smartphone, Code, Download } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  Monitor, 
+  Smartphone, 
+  Download, 
+  Github, 
+  Terminal, 
+  Coffee,
+  Code,
+  CheckCircle2
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Steps, Step } from '@/components/ui/steps';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ExportGuide = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Exporting Flash Converter to Android</h1>
-      
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Prerequisites</CardTitle>
-          <CardDescription>Required tools and software for building the Android app</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="bg-green-100 rounded-full p-1 mt-1">
-              <Check className="h-4 w-4 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold">Node.js and NPM</h3>
-              <p className="text-sm text-muted-foreground">Install the latest LTS version from <a href="https://nodejs.org" className="text-blue-500 hover:underline">nodejs.org</a></p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <div className="bg-green-100 rounded-full p-1 mt-1">
-              <Check className="h-4 w-4 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold">Android Studio</h3>
-              <p className="text-sm text-muted-foreground">Required to compile and build Android apps. Download from <a href="https://developer.android.com/studio" className="text-blue-500 hover:underline">developer.android.com</a></p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <div className="bg-green-100 rounded-full p-1 mt-1">
-              <Check className="h-4 w-4 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold">Java Development Kit (JDK)</h3>
-              <p className="text-sm text-muted-foreground">JDK 17 or newer is required for Android development</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start gap-3">
-            <div className="bg-green-100 rounded-full p-1 mt-1">
-              <Check className="h-4 w-4 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold">Git</h3>
-              <p className="text-sm text-muted-foreground">For version control and cloning the repository</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Tabs defaultValue="step-by-step">
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="step-by-step">Step-by-Step Guide</TabsTrigger>
-          <TabsTrigger value="plugins">Custom Plugins</TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen bg-gradient-to-br from-flash-50 to-white dark:from-flash-900 dark:to-flash-950">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link to="/" className="flex items-center text-flash-600 hover:text-flash-800 dark:text-flash-400 dark:hover:text-flash-300">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Converter
+          </Link>
+        </div>
         
-        <TabsContent value="step-by-step" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <FileCode className="h-5 w-5 text-flash-500" />
-                <CardTitle>Step 1: Set Up Capacitor</CardTitle>
-              </div>
-              <CardDescription>Initialize the Capacitor framework in your project</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ol className="list-decimal pl-5 space-y-4">
-                <li>
-                  <p className="font-medium">Install Capacitor dependencies:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npm install @capacitor/core @capacitor/android</code><br />
-                    <code>npm install -D @capacitor/cli</code>
-                  </div>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Initialize Capacitor:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npx cap init FlashConverter com.flashconverter.app --web-dir=dist</code>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">This creates a capacitor.config.json file.</p>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Update capacitor.config.json to include the following:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <pre>{`{
-  "appId": "com.flashconverter.app",
-  "appName": "Flash Converter",
-  "webDir": "dist",
-  "server": {
-    "androidScheme": "https"
-  },
-  "plugins": {
-    "Permissions": {
-      "requestPermissions": ["storage", "camera"]
-    }
-  }
-}`}</pre>
-                  </div>
-                </li>
-              </ol>
-            </CardContent>
-          </Card>
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2 text-flash-800 dark:text-flash-300">
+            Export Guide: Running Flash Converter on Android
+          </h1>
+          <p className="text-flash-600 dark:text-flash-400 mb-8">
+            Follow this comprehensive guide to export Flash Converter as a native Android application 
+            that you can install and use offline on any Android device.
+          </p>
           
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Code className="h-5 w-5 text-flash-500" />
-                <CardTitle>Step 2: Create Custom Native Plugins</CardTitle>
-              </div>
-              <CardDescription>Implement YtDlpPlugin and FFmpegPlugin for Android</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-start gap-3 mb-4">
-                <div className="bg-yellow-100 rounded-full p-1 mt-1">
-                  <Info className="h-4 w-4 text-yellow-600" />
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  This step requires advanced Java/Kotlin knowledge for Android development. You'll need to create native plugins that wrap yt-dlp and FFmpeg libraries for Android.
-                </div>
-              </div>
-              
-              <p className="mb-2">Create custom plugin directories:</p>
-              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 mb-4 overflow-x-auto">
-                <code>mkdir -p android/app/src/main/java/com/flashconverter/app/plugins</code>
-              </div>
-              
-              <p className="text-sm">The detailed implementation of these plugins requires Android development expertise and is beyond the scope of this guide. However, you can find libraries like:</p>
-              
-              <ul className="list-disc pl-5 space-y-2 mt-3">
-                <li><a href="https://github.com/yausername/youtubedl-android" className="text-blue-500 hover:underline">youtubedl-android</a> - A wrapper for yt-dlp on Android</li>
-                <li><a href="https://github.com/tanersener/mobile-ffmpeg" className="text-blue-500 hover:underline">mobile-ffmpeg</a> - FFmpeg for Android and iOS</li>
-              </ul>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-flash-500" />
-                <CardTitle>Step 3: Build and Package</CardTitle>
-              </div>
-              <CardDescription>Build the web app and prepare for Android</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ol className="list-decimal pl-5 space-y-4">
-                <li>
-                  <p className="font-medium">Build the web app:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npm run build</code>
+          <Tabs defaultValue="simple">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="simple">Simple Method</TabsTrigger>
+              <TabsTrigger value="advanced">Advanced Method</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="simple" className="mt-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex justify-center mb-6">
+                    <div className="bg-flash-100 dark:bg-flash-800/30 p-4 rounded-full">
+                      <Smartphone className="h-10 w-10 text-flash-500" />
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">This creates a "dist" folder with your web app.</p>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Add Android platform:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npx cap add android</code>
-                  </div>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Copy web assets to the Android project:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npx cap copy android</code>
-                  </div>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Update Android native code:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npx cap update android</code>
-                  </div>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Open the project in Android Studio:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <code>npx cap open android</code>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">This will launch Android Studio with your project.</p>
-                </li>
-              </ol>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Smartphone className="h-5 w-5 text-flash-500" />
-                <CardTitle>Step 4: Build and Run on Android</CardTitle>
-              </div>
-              <CardDescription>Compile and test on Android devices</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <ol className="list-decimal pl-5 space-y-4">
-                <li>
-                  <p className="font-medium">In Android Studio:</p>
-                  <ul className="list-disc pl-5 space-y-2 mt-2">
-                    <li>Wait for the Gradle sync to complete</li>
-                    <li>Update Android SDK if prompted</li>
-                    <li>Ensure all dependencies are resolved</li>
-                  </ul>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Set up permissions in AndroidManifest.xml:</p>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto">
-                    <pre>{`<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />`}</pre>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">These permissions are necessary for downloading and storing files.</p>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Test on an emulator or physical device:</p>
-                  <ul className="list-disc pl-5 space-y-2 mt-2">
-                    <li>Click the "Run" button (green triangle) in Android Studio</li>
-                    <li>Select a virtual device or connect a physical device</li>
-                    <li>Wait for the app to build and deploy</li>
-                  </ul>
-                </li>
-                
-                <li>
-                  <p className="font-medium">Generate signed APK for distribution:</p>
-                  <ul className="list-disc pl-5 space-y-2 mt-2">
-                    <li>From menu: Build → Generate Signed Bundle/APK</li>
-                    <li>Choose "APK" and follow the wizard</li>
-                    <li>Create a new key store if you don't have one</li>
-                    <li>Select "release" build variant</li>
-                    <li>Wait for the build process to complete</li>
-                  </ul>
-                </li>
-              </ol>
-              
-              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-md mt-4 flex items-start gap-3">
-                <div className="mt-1">
-                  <Download className="h-5 w-5 text-blue-500" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-blue-700 dark:text-blue-300">Your APK is ready!</h4>
-                  <p className="text-sm text-blue-600 dark:text-blue-400">
-                    The final APK will be located at:<br />
-                    <code className="text-xs">android/app/build/outputs/apk/release/app-release.apk</code>
+                  
+                  <h2 className="text-2xl font-bold text-center mb-6 text-flash-800 dark:text-flash-300">
+                    Download Pre-built APK
+                  </h2>
+                  
+                  <p className="text-flash-600 dark:text-flash-400 mb-4">
+                    The easiest way to get Flash Converter on your Android device is to download our 
+                    pre-built APK file. This method doesn't require any technical knowledge.
                   </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="plugins">
-          <Card>
-            <CardHeader>
-              <CardTitle>Custom Plugins Implementation</CardTitle>
-              <CardDescription>Technical details for integrating yt-dlp and FFmpeg in Android</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="font-semibold mb-2">YtDlpPlugin (Kotlin)</h3>
-                <p className="text-sm mb-3">This plugin provides a bridge between your JavaScript code and the native yt-dlp library:</p>
-                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto text-xs">
-                  <pre>{`package com.flashconverter.app.plugins
-
-import android.util.Log
-import com.getcapacitor.JSObject
-import com.getcapacitor.Plugin
-import com.getcapacitor.PluginCall
-import com.getcapacitor.PluginMethod
-import com.getcapacitor.annotation.CapacitorPlugin
-import com.yausername.youtubedl_android.YoutubeDL
-import com.yausername.youtubedl_android.YoutubeDLRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.File
-
-@CapacitorPlugin(name = "YtDlpPlugin")
-class YtDlpPlugin : Plugin() {
-    private val TAG = "YtDlpPlugin"
-
-    override fun load() {
-        super.load()
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                YoutubeDL.init(context)
-                Log.d(TAG, "YoutubeDL initialized")
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to initialize YoutubeDL", e)
-            }
-        }
-    }
-
-    @PluginMethod
-    fun getVideoInfo(call: PluginCall) {
-        val url = call.getString("url") ?: run {
-            call.reject("URL is required")
-            return
-        }
-
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val request = YoutubeDLRequest(url)
-                request.addOption("--dump-json")
-                request.addOption("--no-playlist")
-
-                val videoInfo = YoutubeDL.getInstance().getInfo(request)
-                val jsonObject = JSONObject(videoInfo.json)
-                
-                val result = JSObject()
-                result.put("info", JSObject(jsonObject.toString()))
-                
-                withContext(Dispatchers.Main) {
-                    call.resolve(result)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error getting video info", e)
-                withContext(Dispatchers.Main) {
-                    call.reject("Failed to get video info", e)
-                }
-            }
-        }
-    }
-
-    @PluginMethod
-    fun download(call: PluginCall) {
-        val url = call.getString("url") ?: run {
-            call.reject("URL is required")
-            return
-        }
-        val format = call.getString("format") ?: "mp4"
-        val outputPath = call.getString("outputPath") ?: run {
-            call.reject("Output path is required")
-            return
-        }
-        val quality = call.getString("quality") ?: "best"
-        val isAudio = call.getBoolean("isAudio") ?: false
-
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val request = YoutubeDLRequest(url)
-                
-                // Configure output directory
-                val outputDir = File(outputPath)
-                if (!outputDir.exists()) {
-                    outputDir.mkdirs()
-                }
-                request.addOption("-o", outputDir.absolutePath + "/%(title)s.%(ext)s")
-                
-                // Configure format options
-                if (isAudio) {
-                    request.addOption("-x")
-                    request.addOption("--audio-format", "mp3")
-                    request.addOption("--audio-quality", quality)
-                } else {
-                    request.addOption("-f", "bestvideo[height<=?$quality]+bestaudio/best")
-                }
-                
-                // Set progress listener
-                YoutubeDL.getInstance().setDownloadProgressCallback { progress, etaInSeconds ->
-                    val progressData = JSObject()
-                    progressData.put("progress", progress.toInt())
-                    notifyListeners("downloadProgress", progressData)
-                }
-                
-                // Execute download
-                val downloadResult = YoutubeDL.getInstance().execute(request)
-                
-                withContext(Dispatchers.Main) {
-                    if (downloadResult.exitCode == 0) {
-                        val responseObject = JSObject()
-                        responseObject.put("success", true)
-                        responseObject.put("path", outputDir.absolutePath)
-                        call.resolve(responseObject)
-                    } else {
-                        call.reject("Download failed with exit code: ${downloadResult.exitCode}")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error downloading", e)
-                withContext(Dispatchers.Main) {
-                    call.reject("Download failed", e)
-                }
-            }
-        }
-    }
-}`}</pre>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold mb-2">FFmpegPlugin (Kotlin)</h3>
-                <p className="text-sm mb-3">This plugin handles media conversion using FFmpeg:</p>
-                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto text-xs">
-                  <pre>{`package com.flashconverter.app.plugins
-
-import android.util.Log
-import com.arthenica.mobileffmpeg.Config
-import com.arthenica.mobileffmpeg.FFmpeg
-import com.getcapacitor.JSObject
-import com.getcapacitor.Plugin
-import com.getcapacitor.PluginCall
-import com.getcapacitor.PluginMethod
-import com.getcapacitor.annotation.CapacitorPlugin
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-
-@CapacitorPlugin(name = "FFmpegPlugin")
-class FFmpegPlugin : Plugin() {
-    private val TAG = "FFmpegPlugin"
-
-    @PluginMethod
-    fun convert(call: PluginCall) {
-        val inputPath = call.getString("inputPath") ?: run {
-            call.reject("Input path is required")
-            return
-        }
-        val outputPath = call.getString("outputPath") ?: run {
-            call.reject("Output path is required")
-            return
-        }
-        val format = call.getString("format") ?: "mp3"
-        val quality = call.getString("quality") ?: "192k"
-        
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val outputDir = File(outputPath)
-                if (!outputDir.exists()) {
-                    outputDir.mkdirs()
-                }
-                
-                val outputFile = File(outputDir, "converted_file.$format").absolutePath
-                
-                // Set up progress monitoring
-                Config.enableStatisticsCallback { statistics ->
-                    val timeInMilliseconds = statistics.time
-                    val duration = 90000 // This would come from mediainfo in a real app
-                    val progress = if (duration > 0) (timeInMilliseconds * 100 / duration) else 0
+                  
+                  <Steps>
+                    <Step number={1} title="Download the APK">
+                      <p>Visit our GitHub releases page and download the latest APK file to your Android device.</p>
+                      <div className="mt-4">
+                        <Button className="flex gap-2">
+                          <Download className="h-4 w-4" />
+                          Download latest APK
+                        </Button>
+                      </div>
+                    </Step>
                     
-                    val progressData = JSObject()
-                    progressData.put("progress", progress)
-                    notifyListeners("conversionProgress", progressData)
-                }
-                
-                // Build FFmpeg command based on format
-                val command = when (format) {
-                    "mp3" -> {
-                        // Audio conversion
-                        val bitrateValue = quality.replace("k", "")
-                        arrayOf("-i", inputPath, "-b:a", "${bitrateValue}k", outputFile)
-                    }
-                    "mp4" -> {
-                        // Video conversion
-                        val resolution = when (quality) {
-                            "480" -> "640x480"
-                            "720" -> "1280x720"
-                            "1080" -> "1920x1080"
-                            else -> "640x360"
-                        }
-                        arrayOf("-i", inputPath, "-s", resolution, "-c:a", "aac", "-c:v", "libx264", outputFile)
-                    }
-                    else -> {
-                        // Default passthrough
-                        arrayOf("-i", inputPath, outputFile)
-                    }
-                }
-                
-                // Execute FFmpeg command
-                val returnCode = FFmpeg.execute(command)
-                
-                withContext(Dispatchers.Main) {
-                    if (returnCode == 0) {
-                        val responseObject = JSObject()
-                        responseObject.put("success", true)
-                        responseObject.put("path", outputFile)
-                        call.resolve(responseObject)
-                    } else {
-                        call.reject("Conversion failed with code: $returnCode")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error during conversion", e)
-                withContext(Dispatchers.Main) {
-                    call.reject("Conversion failed", e)
-                }
-            }
-        }
-    }
-}`}</pre>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold mb-2">Registering Plugins</h3>
-                <p className="text-sm mb-3">Add these plugins to your MainActivity.java:</p>
-                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto text-xs">
-                  <pre>{`// MainActivity.java
-package com.flashconverter.app;
-
-import android.os.Bundle;
-import com.flashconverter.app.plugins.YtDlpPlugin;
-import com.flashconverter.app.plugins.FFmpegPlugin;
-import com.getcapacitor.BridgeActivity;
-
-public class MainActivity extends BridgeActivity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        // Register plugins
-        registerPlugin(YtDlpPlugin.class);
-        registerPlugin(FFmpegPlugin.class);
-    }
-}`}</pre>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold mb-2">Adding Dependencies</h3>
-                <p className="text-sm mb-3">Add these dependencies to your app/build.gradle file:</p>
-                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto text-xs">
-                  <pre>{`dependencies {
-    // Existing dependencies...
-    
-    // yt-dlp Android wrapper
-    implementation 'com.github.yausername.youtubedl-android:library:0.14.0'
-    implementation 'com.github.yausername.youtubedl-android:ffmpeg:0.14.0'
-    
-    // Mobile FFmpeg
-    implementation 'com.arthenica:mobile-ffmpeg-full:4.4'
-    
-    // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-}`}</pre>
-                </div>
-                <p className="text-sm mt-2 text-muted-foreground">Make sure to also add the jitpack repository to your project's build.gradle:</p>
-                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-md mt-2 overflow-x-auto text-xs">
-                  <pre>{`allprojects {
-    repositories {
-        // Existing repositories...
-        maven { url 'https://jitpack.io' }
-    }
-}`}</pre>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                    <Step number={2} title="Enable Unknown Sources">
+                      <p>Before installing, you need to allow installations from unknown sources:</p>
+                      <ul className="list-disc list-inside space-y-2 mt-2 text-flash-600 dark:text-flash-400">
+                        <li>Open your device Settings</li>
+                        <li>Go to Security or Privacy settings</li>
+                        <li>Enable "Unknown Sources" or "Install Unknown Apps"</li>
+                      </ul>
+                    </Step>
+                    
+                    <Step number={3} title="Install the App">
+                      <p>Open the downloaded APK file and follow the installation prompts.</p>
+                      <div className="bg-flash-50 dark:bg-flash-800/30 p-4 rounded-lg mt-3">
+                        <p className="text-sm text-flash-700 dark:text-flash-300">
+                          <strong>Note:</strong> If you see a security warning, it's because the app isn't from the Google Play Store. 
+                          This is normal for directly downloaded APKs. Our app is safe to install.
+                        </p>
+                      </div>
+                    </Step>
+                    
+                    <Step number={4} title="Start Using Flash Converter">
+                      <p>Once installed, you can open Flash Converter and start downloading videos right away!</p>
+                      <div className="flex gap-2 mt-4 items-center">
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        <p className="text-flash-700 dark:text-flash-300 font-medium">All features work offline!</p>
+                      </div>
+                    </Step>
+                  </Steps>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="advanced" className="mt-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex justify-center mb-6">
+                    <div className="bg-flash-100 dark:bg-flash-800/30 p-4 rounded-full">
+                      <Code className="h-10 w-10 text-flash-500" />
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-2xl font-bold text-center mb-6 text-flash-800 dark:text-flash-300">
+                    Build from Source
+                  </h2>
+                  
+                  <p className="text-flash-600 dark:text-flash-400 mb-4">
+                    For developers or advanced users who want to customize the app, you can build Flash Converter 
+                    from source code. This gives you full control over the application.
+                  </p>
+                  
+                  <Steps>
+                    <Step number={1} title="Prerequisites">
+                      <p>Make sure you have the following installed:</p>
+                      <ul className="list-disc list-inside space-y-2 mt-2 text-flash-600 dark:text-flash-400">
+                        <li>Git</li>
+                        <li>Node.js (v18+)</li>
+                        <li>Android Studio</li>
+                        <li>JDK 17+</li>
+                      </ul>
+                    </Step>
+                    
+                    <Step number={2} title="Clone the Repository">
+                      <p className="mb-2">Open a terminal and clone our GitHub repository:</p>
+                      <div className="bg-flash-800 text-flash-50 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                        git clone https://github.com/yourusername/flash-converter.git
+                        <br/>
+                        cd flash-converter
+                      </div>
+                    </Step>
+                    
+                    <Step number={3} title="Install Dependencies">
+                      <p className="mb-2">Install all required packages:</p>
+                      <div className="bg-flash-800 text-flash-50 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                        npm install
+                        <br/>
+                        npm install -g @capacitor/cli
+                      </div>
+                    </Step>
+                    
+                    <Step number={4} title="Build the Project">
+                      <p className="mb-2">Build the React application:</p>
+                      <div className="bg-flash-800 text-flash-50 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                        npm run build
+                      </div>
+                    </Step>
+                    
+                    <Step number={5} title="Add Android Platform">
+                      <p className="mb-2">Initialize Capacitor with Android:</p>
+                      <div className="bg-flash-800 text-flash-50 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                        npx cap add android
+                        <br/>
+                        npx cap sync
+                      </div>
+                    </Step>
+                    
+                    <Step number={6} title="Open in Android Studio">
+                      <p className="mb-2">Open the project in Android Studio:</p>
+                      <div className="bg-flash-800 text-flash-50 p-3 rounded-md font-mono text-sm overflow-x-auto">
+                        npx cap open android
+                      </div>
+                      <p className="mt-2">In Android Studio, you can customize the app further if needed.</p>
+                    </Step>
+                    
+                    <Step number={7} title="Build and Export APK">
+                      <p>From Android Studio:</p>
+                      <ul className="list-disc list-inside space-y-2 mt-2 text-flash-600 dark:text-flash-400">
+                        <li>Go to Build &gt; Build Bundle(s) / APK(s) &gt; Build APK(s)</li>
+                        <li>When complete, click "locate" to find your APK file</li>
+                        <li>Transfer this APK to your Android device to install</li>
+                      </ul>
+                    </Step>
+                  </Steps>
+                  
+                  <div className="bg-flash-50 dark:bg-flash-800/30 p-4 rounded-lg mt-8">
+                    <h3 className="font-bold text-flash-800 dark:text-flash-300 flex items-center gap-2">
+                      <Coffee className="h-5 w-5" /> Developer Tips
+                    </h3>
+                    <ul className="list-disc list-inside space-y-2 mt-2 text-flash-600 dark:text-flash-400">
+                      <li>Add <code>android:usesCleartextTraffic="true"</code> to your AndroidManifest.xml if you face network issues</li>
+                      <li>To debug on a connected device, run <code>npx cap run android</code></li>
+                      <li>For file system access, the app needs proper permissions in the manifest</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+          
+          <div className="mt-12 text-center">
+            <h2 className="text-2xl font-bold mb-4 text-flash-800 dark:text-flash-300">
+              Need Help?
+            </h2>
+            <p className="text-flash-600 dark:text-flash-400 mb-6 max-w-xl mx-auto">
+              If you encounter any issues during the export process, check out our GitHub repository 
+              for troubleshooting guides or open an issue for support.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Button variant="outline" className="flex gap-2">
+                <Github className="h-4 w-4" />
+                View on GitHub
+              </Button>
+              <Button variant="default" className="flex gap-2">
+                <Terminal className="h-4 w-4" />
+                Troubleshooting Guide
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

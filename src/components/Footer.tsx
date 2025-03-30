@@ -1,10 +1,31 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { GitHubIcon } from "@/components/ui/icons";
+import { Github } from "lucide-react";
 import { ExternalLink, HelpCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import DeveloperCard from './DeveloperCard';
+
+// Developer data
+const developers = [
+  {
+    name: "Alexandra Kim",
+    photo: "https://i.pravatar.cc/300?img=1",
+    githubUrl: "https://github.com/alexkim"
+  },
+  {
+    name: "Marcus Johnson",
+    photo: "https://i.pravatar.cc/300?img=2",
+    githubUrl: "https://github.com/mjohnson"
+  },
+  {
+    name: "Priya Sharma",
+    photo: "https://i.pravatar.cc/300?img=3",
+    githubUrl: "https://github.com/priyasharma"
+  }
+];
 
 const Footer = () => {
   return (
@@ -82,11 +103,21 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Developer Section */}
+        {/* Developer Section with Carousel */}
         <div className="mt-12">
           <h3 className="text-lg font-bold mb-4 text-flash-800 dark:text-flash-300 text-center">Meet the Developers</h3>
-          <div className="flex flex-wrap gap-4 justify-center">
-            {/* Developer cards will be automatically inserted here from the DeveloperCard component */}
+          <div className="relative px-12">
+            <Carousel className="w-full max-w-3xl mx-auto">
+              <CarouselContent>
+                {developers.map((developer, index) => (
+                  <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                    <DeveloperCard developer={developer} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="absolute -left-2 top-1/2 -translate-y-1/2" />
+              <CarouselNext className="absolute -right-2 top-1/2 -translate-y-1/2" />
+            </Carousel>
           </div>
         </div>
 
@@ -102,7 +133,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="flex items-center text-flash-600 hover:text-flash-800 dark:text-flash-400 dark:hover:text-flash-300"
             >
-              <GitHubIcon className="h-5 w-5 mr-1" />
+              <Github className="h-5 w-5 mr-1" />
               <span>Github</span>
             </a>
             <a 
