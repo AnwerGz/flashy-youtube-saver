@@ -13,6 +13,13 @@ const config: CapacitorConfig = {
     Permissions: {
       requestPermissions: ['storage']
     }
+  },
+  android: {
+    // Make sure we're using a compatible Gradle version
+    minSdkVersion: 22,
+    // This will work with JDK 21, which you mentioned you have
+    buildToolsVersion: "33.0.2",
+    gradleVersion: "8.0.0"
   }
 };
 
