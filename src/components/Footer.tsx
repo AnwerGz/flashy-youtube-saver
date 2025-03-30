@@ -2,28 +2,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Github } from "lucide-react";
-import { ExternalLink, HelpCircle } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import DeveloperCard from './DeveloperCard';
 
 // Developer data
 const developers = [
   {
-    name: "Alexandra Kim",
-    photo: "https://i.pravatar.cc/300?img=1",
-    githubUrl: "https://github.com/alexkim"
+    name: "DeJavi",
+    photo: "https://raw.githubusercontent.com/DeJavi08/YTPlaylist-DW/refs/heads/master/src/dejavi.jpg",
+    githubUrl: "https://github.com/DeJavi08/"
   },
   {
-    name: "Marcus Johnson",
-    photo: "https://i.pravatar.cc/300?img=2",
-    githubUrl: "https://github.com/mjohnson"
+    name: "D38R15",
+    photo: "https://raw.githubusercontent.com/DeJavi08/YTPlaylist-DW/refs/heads/master/src/wokabi.jpg",
+    githubUrl: "https://github.com/Hamzah82"
   },
   {
-    name: "Priya Sharma",
-    photo: "https://i.pravatar.cc/300?img=3",
-    githubUrl: "https://github.com/priyasharma"
+    name: "DevilGun",
+    photo: "https://raw.githubusercontent.com/DeJavi08/YTPlaylist-DW/refs/heads/master/src/electrogaming.png",
+    githubUrl: "https://github.com/WeebCoderr"
   }
 ];
 
@@ -41,15 +40,6 @@ const Footer = () => {
             <p className="text-flash-600 dark:text-flash-400">
               Our application uses optimized algorithms to provide the fastest download speeds while maintaining the highest possible quality for your media files.
             </p>
-            <div className="mt-4">
-              <Link 
-                to="/export-guide"
-                className="inline-flex items-center text-flash-500 hover:text-flash-600 font-medium"
-              >
-                <HelpCircle className="h-4 w-4 mr-2" />
-                How to export to Android
-              </Link>
-            </div>
           </div>
 
           {/* Column 2 - How to Use */}
@@ -128,7 +118,7 @@ const Footer = () => {
           <p className="text-flash-600 dark:text-flash-400 mb-4 md:mb-0">© 2025 Flash Converter. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a 
-              href="https://github.com/yourusername/flash-converter" 
+              href="https://github.com/DeJavi08/Flash-YTDW" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center text-flash-600 hover:text-flash-800 dark:text-flash-400 dark:hover:text-flash-300"
@@ -137,7 +127,7 @@ const Footer = () => {
               <span>Github</span>
             </a>
             <a 
-              href="https://ko-fi.com/yourusername" 
+              href="https://saweria.co/DeJavi08" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center text-flash-600 hover:text-flash-800 dark:text-flash-400 dark:hover:text-flash-300"

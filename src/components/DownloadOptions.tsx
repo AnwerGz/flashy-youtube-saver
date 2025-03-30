@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from '@/context/LanguageContext';
-import { Folder, Info } from "lucide-react";
+import { Folder } from "lucide-react";
 
 // Fix the type of props
 interface DownloadOptionsProps {
@@ -19,11 +19,13 @@ interface DownloadOptionsProps {
 const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist, url }) => {
   const { t } = useLanguage();
   const [format, setFormat] = useState<string>('mp3');
-  const [quality, setQuality] = useState<string>('medium');
+  const [quality, setQuality] = useState<string>(format === 'mp3' ? '192kbps' : '720p');
   const [outputPath, setOutputPath] = useState<string>('');
 
   const handleFormatChange = (value: string) => {
     setFormat(value);
+    // Reset quality when format changes
+    setQuality(value === 'mp3' ? '192kbps' : '720p');
   };
 
   const handleQualityChange = (value: string) => {
@@ -94,7 +96,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
     try {
       toast({
         title: "Download started",
-        description: `Downloading ${isPlaylist ? 'playlist' : 'video'} in ${format.toUpperCase()} format`
+        description: `Downloading ${isPlaylist ? 'playlist' : 'video'} in ${format.toUpperCase()} format at ${quality} quality`
       });
 
       // Simulate download process
@@ -137,17 +139,29 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
           </div>
         </RadioGroup>
 
-        {/* Quality Selection */}
+        {/* Quality Selection - different options based on format */}
         <div className="space-y-2">
-          <Label>{t('quality')}</Label>
+          <Label>{format === 'mp3' ? 'Audio Quality' : 'Video Quality'}</Label>
           <Select value={quality} onValueChange={handleQualityChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select quality" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="low">{t('low')}</SelectItem>
-              <SelectItem value="medium">{t('medium')}</SelectItem>
-              <SelectItem value="high">{t('high')}</SelectItem>
+              {format === 'mp3' ? (
+                <>
+                  <SelectItem value="128kbps">128 kbps</SelectItem>
+                  <SelectItem value="192kbps">192 kbps</SelectItem>
+                  <SelectItem value="256kbps">256 kbps</SelectItem>
+                  <SelectItem value="320kbps">320 kbps</SelectItem>
+                </>
+              ) : (
+                <>
+                  <SelectItem value="360p">360p</SelectItem>
+                  <SelectItem value="480p">480p</SelectItem>
+                  <SelectItem value="720p">720p</SelectItem>
+                  <SelectItem value="1080p">1080p</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>
