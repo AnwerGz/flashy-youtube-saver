@@ -125,7 +125,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
           <TabsContent value="mp3" className="mt-0 space-y-4">
             <div className="text-sm text-muted-foreground mb-4">
               {t('mp3_description')}
-              {isPlaylist && t('playlist_mp3_note')}
+              {isPlaylist && <span> {t('playlist_mp3_note')}</span>}
             </div>
             
             <div className="space-y-4">
@@ -161,7 +161,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
           <TabsContent value="mp4" className="mt-0 space-y-4">
             <div className="text-sm text-muted-foreground mb-4">
               {t('mp4_description')}
-              {isPlaylist && t('playlist_mp4_note')}
+              {isPlaylist && <span> {t('playlist_mp4_note')}</span>}
             </div>
             
             <div className="space-y-2">

@@ -185,13 +185,9 @@ export const downloadVideo = async (
       const { YtDlpPlugin } = (window as any).Capacitor.Plugins;
       
       // Request storage permission
-      const { Filesystem, Permissions } = (window as any).Capacitor.Plugins;
+      const permissionGranted = await requestStoragePermission();
       
-      const permissionResult = await Permissions.requestPermissions({
-        permissions: ['storage']
-      });
-      
-      if (permissionResult.permissions.storage.granted) {
+      if (permissionGranted) {
         // Start download with the plugin
         const downloadOptions = {
           url,
@@ -202,11 +198,15 @@ export const downloadVideo = async (
         };
         
         // Subscribe to download progress
-        YtDlpPlugin.addListener('downloadProgress', (data: { progress: number }) => {
+        const handle = await YtDlpPlugin.addListener('downloadProgress', (data: { progress: number }) => {
           progressCallback(data.progress);
         });
         
         const result = await YtDlpPlugin.download(downloadOptions);
+        
+        // Remove listener after download completes
+        await handle.remove();
+        
         return result.success;
       } else {
         toast.error("Storage permission is required for downloading");
@@ -222,13 +222,24 @@ export const downloadVideo = async (
   }
 };
 
+// Request storage permission for Android
 export const requestStoragePermission = async (): Promise<boolean> => {
   if (isCapacitorNative()) {
     const { Permissions } = (window as any).Capacitor.Plugins;
     try {
+      // Check current permissions first
+      const checkResult = await Permissions.checkPermissions();
+      if (checkResult.permissions.storage?.granted) {
+        return true;
+      }
+      
+      // Request permission if not granted
+      console.log("Requesting storage permission...");
       const result = await Permissions.requestPermissions({
         permissions: ['storage']
       });
+      
+      console.log("Permission request result:", result);
       return result.permissions.storage.granted;
     } catch (error) {
       console.error("Error requesting storage permission:", error);
@@ -237,4 +248,39 @@ export const requestStoragePermission = async (): Promise<boolean> => {
   }
   // In browser, we'll assume it's granted
   return true;
+};
+
+// Create directories for output
+export const createDirectory = async (path: string): Promise<boolean> => {
+  if (isCapacitorNative()) {
+    try {
+      const { Filesystem } = (window as any).Capacitor.Plugins;
+      await Filesystem.mkdir({
+        path: path,
+        recursive: true
+      });
+      return true;
+    } catch (error) {
+      console.error("Error creating directory:", error);
+      return false;
+    }
+  }
+  return true;
+};
+
+// List available storage directories
+export const listDirectories = async (): Promise<string[]> => {
+  if (isCapacitorNative()) {
+    try {
+      const { Filesystem } = (window as any).Capacitor.Plugins;
+      const result = await Filesystem.readdir({
+        path: "/"
+      });
+      return result.files;
+    } catch (error) {
+      console.error("Error listing directories:", error);
+      return [];
+    }
+  }
+  return ["Downloads"];
 };

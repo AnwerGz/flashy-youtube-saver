@@ -15,9 +15,6 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     // Check if theme is stored in localStorage
     const savedTheme = localStorage.getItem("theme");
     // Default to light mode
-    if (!savedTheme) {
-      return "light";
-    }
     return (savedTheme as Theme) || "light";
   });
 

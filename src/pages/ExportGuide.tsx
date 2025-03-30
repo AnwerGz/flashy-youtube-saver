@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -378,16 +379,16 @@ class YtDlpPlugin : Plugin() {
                 }
                 
                 // Execute download
-                val result = YoutubeDL.getInstance().execute(request)
+                val downloadResult = YoutubeDL.getInstance().execute(request)
                 
                 withContext(Dispatchers.Main) {
-                    if (result.exitCode == 0) {
-                        val response = JSObject()
-                        response.put("success", true)
-                        response.put("path", outputDir.absolutePath)
-                        call.resolve(response)
+                    if (downloadResult.exitCode == 0) {
+                        val responseObject = JSObject()
+                        responseObject.put("success", true)
+                        responseObject.put("path", outputDir.absolutePath)
+                        call.resolve(responseObject)
                     } else {
-                        call.reject("Download failed with exit code: ${result.exitCode}")
+                        call.reject("Download failed with exit code: ${downloadResult.exitCode}")
                     }
                 }
             } catch (e: Exception) {
@@ -463,8 +464,8 @@ class FFmpegPlugin : Plugin() {
                 val command = when (format) {
                     "mp3" -> {
                         // Audio conversion
-                        val bitrate = quality.replace("k", "")
-                        arrayOf("-i", inputPath, "-b:a", "${bitrate}k", outputFile)
+                        val bitrateValue = quality.replace("k", "")
+                        arrayOf("-i", inputPath, "-b:a", "${bitrateValue}k", outputFile)
                     }
                     "mp4" -> {
                         // Video conversion
@@ -487,10 +488,10 @@ class FFmpegPlugin : Plugin() {
                 
                 withContext(Dispatchers.Main) {
                     if (returnCode == 0) {
-                        val result = JSObject()
-                        result.put("success", true)
-                        result.put("path", outputFile)
-                        call.resolve(result)
+                        val responseObject = JSObject()
+                        responseObject.put("success", true)
+                        responseObject.put("path", outputFile)
+                        call.resolve(responseObject)
                     } else {
                         call.reject("Conversion failed with code: $returnCode")
                     }
