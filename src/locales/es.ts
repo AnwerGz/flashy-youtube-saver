@@ -4,6 +4,9 @@ export default {
   "app_name": "Flash Converter",
   "dark_mode": "Modo Oscuro",
   "language": "Idioma",
+  "menu": "Menú",
+  "home": "Inicio",
+  "logs": "Registro de Descargas",
   
   // Main Content
   "paste_link": "Pega el enlace de YouTube",
@@ -17,6 +20,48 @@ export default {
   "medium": "Media",
   "high": "Alta",
   "select_folder": "Seleccionar Carpeta",
+  "analyze": "Analizar",
+  "processing": "Procesando...",
+  "enter_url": "Por favor, introduce una URL de YouTube",
+  "invalid_url": "Por favor, introduce una URL válida de YouTube",
+  "video_info_failed": "No se pudo obtener la información del video",
+  "youtube_video": "Video de YouTube",
+  "youtube_playlist": "Lista de reproducción de YouTube",
+  "videos": "videos",
+  "videos_in_playlist": "videos en esta lista de reproducción. Todos los videos serán procesados.",
+  "ready_to_download": "Listo para descargar. Elige tu formato a continuación.",
+  "download_options": "Opciones de Descarga",
+  "mp3_description": "Extrae el audio del video en formato MP3 con alta calidad.",
+  "playlist_mp3_note": " Todos los videos de la lista serán convertidos a MP3.",
+  "mp4_description": "Descarga el video en formato MP4 con la calidad seleccionada.",
+  "playlist_mp4_note": " Todos los videos de la lista serán descargados como MP4.",
+  "audio_quality": "Calidad de Audio",
+  "video_quality": "Calidad de Video",
+  "select_quality": "Seleccionar calidad",
+  "best": "Mejor",
+  "variable_bitrate": "Tasa de Bits Variable (VBR)",
+  "output_location": "Ubicación de Salida",
+  "browse": "Explorar",
+  "downloading": "Descargando",
+  "download_completed": "¡Descarga completada! Guardado en {path}",
+  "download_failed": "Error en la descarga",
+  "starting_download": "Comenzando descarga como {format}...",
+  "storage_permission": "Permiso de Almacenamiento",
+  "storage_permission_description": "Se requiere permiso para acceder al almacenamiento de su dispositivo para guardar los archivos descargados. Por favor, conceda el permiso cuando se le solicite.",
+  "cancel": "Cancelar",
+  "grant_permission": "Conceder Permiso",
+  "storage_permission_required": "Se requiere permiso de almacenamiento para la descarga",
+  "folder_selected": "Carpeta de salida seleccionada",
+  "folder_error": "Error al seleccionar la carpeta",
+  
+  // Log History
+  "log_history": "Historial de Descargas",
+  "download_history": "Ver el historial de tus descargas de YouTube",
+  "back_to_home": "Volver al Inicio",
+  "clear_logs": "Borrar Historial",
+  "no_logs": "Sin Historial de Descargas",
+  "no_downloads_yet": "Aún no has descargado ningún video",
+  "go_to_home": "Ir a la página de inicio para descargar videos",
   
   // Footer
   "about_title": "Acerca de Flash Converter",
@@ -39,5 +84,5 @@ export default {
   
   "meet_developers": "Conoce a los Desarrolladores",
   "support_developers": "Apoya a los Desarrolladores",
-  "copyright": "© 2023 Flash Converter. Todos los derechos reservados."
+  "copyright": "© 2025 Flash Converter. Todos los derechos reservados."
 };

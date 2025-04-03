@@ -59,20 +59,19 @@ const Header = () => {
             <SheetContent side="left" className="w-64 sm:max-w-sm">
               <SheetHeader className="pb-6 flex flex-col items-center">
                 <div className="w-16 h-16 bg-flash-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="32" 
-                    height="32" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    className="text-white"
-                  >
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
+                  {theme === 'dark' ? (
+                    <img 
+                      src="/lovable-uploads/d89630eb-38d6-4620-b6a1-cf1e8ea985e2.png" 
+                      alt="Thunder Icon" 
+                      className="w-10 h-10"
+                    />
+                  ) : (
+                    <img 
+                      src="/lovable-uploads/177c61a3-43a5-49e1-97cd-6d598161949c.png" 
+                      alt="Thunder Icon" 
+                      className="w-10 h-10"
+                    />
+                  )}
                 </div>
                 <SheetTitle>{t('app_name')}</SheetTitle>
                 <SheetDescription>

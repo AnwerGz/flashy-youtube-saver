@@ -12,31 +12,53 @@ import NotFound from "./pages/NotFound";
 import ExportGuide from "./pages/ExportGuide";
 import LogHistory from "./pages/LogHistory";
 import { initializeDefaultDirectories } from "./utils/ytdlp";
+import { toast } from "./components/ui/use-toast";
+import { useLogHistory } from "./pages/LogHistory";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+// Create a wrapper component to use hooks
+const AppContent = () => {
+  const { addLog } = useLogHistory();
+  
   // Initialize default directories when app starts
   useEffect(() => {
-    initializeDefaultDirectories();
-  }, []);
+    const initialize = async () => {
+      try {
+        await initializeDefaultDirectories();
+      } catch (error) {
+        // Don't show the Capacitor Plugin error to the user
+        // Just log it for debugging purposes
+        addLog(`Storage initialization: Using browser storage instead of native storage.`, 'info');
+        console.log("Storage initialization: Using browser storage. Native storage may not be available in this environment.");
+      }
+    };
+    
+    initialize();
+  }, [addLog]);
   
   return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/logs" element={<LogHistory />} />
+        <Route path="/export-guide" element={<ExportGuide />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light"> {/* Set default theme to light */}
+      <ThemeProvider defaultTheme="light">
         <LanguageProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/logs" element={<LogHistory />} />
-                <Route path="/export-guide" element={<ExportGuide />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
+            <AppContent />
           </TooltipProvider>
         </LanguageProvider>
       </ThemeProvider>

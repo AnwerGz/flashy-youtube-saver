@@ -4,6 +4,9 @@ export default {
   "app_name": "Flash Converter",
   "dark_mode": "Dark Mode",
   "language": "Language",
+  "menu": "Menu",
+  "home": "Home",
+  "logs": "Download Logs",
   
   // Main Content
   "paste_link": "Paste YouTube link",
@@ -50,6 +53,15 @@ export default {
   "storage_permission_required": "Storage permission is required for downloading",
   "folder_selected": "Output folder selected",
   "folder_error": "Error selecting folder",
+  
+  // Log History
+  "log_history": "Download History",
+  "download_history": "View the history of your YouTube downloads",
+  "back_to_home": "Back to Home",
+  "clear_logs": "Clear History",
+  "no_logs": "No Download History",
+  "no_downloads_yet": "You haven't downloaded any videos yet",
+  "go_to_home": "Go to home page to download videos",
   
   // Footer
   "about_title": "About Flash Converter",

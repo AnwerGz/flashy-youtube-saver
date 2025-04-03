@@ -4,6 +4,9 @@ export default {
   "app_name": "Flash Converter",
   "dark_mode": "Mode Gelap",
   "language": "Bahasa",
+  "menu": "Menu",
+  "home": "Beranda",
+  "logs": "Riwayat Unduhan",
   
   // Main Content
   "paste_link": "Tempel tautan YouTube",
@@ -17,6 +20,48 @@ export default {
   "medium": "Sedang",
   "high": "Tinggi",
   "select_folder": "Pilih Folder",
+  "analyze": "Analisis",
+  "processing": "Memproses...",
+  "enter_url": "Silakan masukkan URL YouTube",
+  "invalid_url": "Silakan masukkan URL YouTube yang valid",
+  "video_info_failed": "Gagal mendapatkan informasi video",
+  "youtube_video": "Video YouTube",
+  "youtube_playlist": "Playlist YouTube",
+  "videos": "video",
+  "videos_in_playlist": "video dalam playlist ini. Semua video akan diproses.",
+  "ready_to_download": "Siap untuk diunduh. Pilih format di bawah ini.",
+  "download_options": "Opsi Unduhan",
+  "mp3_description": "Ekstrak audio dari video dalam format MP3 dengan kualitas tinggi.",
+  "playlist_mp3_note": " Semua video dalam playlist akan dikonversi ke MP3.",
+  "mp4_description": "Unduh video dalam format MP4 dengan kualitas yang dipilih.",
+  "playlist_mp4_note": " Semua video dalam playlist akan diunduh sebagai MP4.",
+  "audio_quality": "Kualitas Audio",
+  "video_quality": "Kualitas Video",
+  "select_quality": "Pilih kualitas",
+  "best": "Terbaik",
+  "variable_bitrate": "Bit Rate Variabel (VBR)",
+  "output_location": "Lokasi Output",
+  "browse": "Telusuri",
+  "downloading": "Mengunduh",
+  "download_completed": "Unduhan selesai! Disimpan ke {path}",
+  "download_failed": "Unduhan gagal",
+  "starting_download": "Mulai mengunduh sebagai {format}...",
+  "storage_permission": "Izin Penyimpanan",
+  "storage_permission_description": "Izin untuk mengakses penyimpanan perangkat Anda diperlukan untuk menyimpan file yang diunduh. Harap berikan izin saat diminta.",
+  "cancel": "Batal",
+  "grant_permission": "Berikan Izin",
+  "storage_permission_required": "Izin penyimpanan diperlukan untuk pengunduhan",
+  "folder_selected": "Folder output dipilih",
+  "folder_error": "Kesalahan saat memilih folder",
+  
+  // Log History
+  "log_history": "Riwayat Unduhan",
+  "download_history": "Lihat riwayat unduhan YouTube Anda",
+  "back_to_home": "Kembali ke Beranda",
+  "clear_logs": "Hapus Riwayat",
+  "no_logs": "Tidak Ada Riwayat Unduhan",
+  "no_downloads_yet": "Anda belum mengunduh video apapun",
+  "go_to_home": "Pergi ke halaman beranda untuk mengunduh video",
   
   // Footer
   "about_title": "Tentang Flash Converter",
@@ -39,5 +84,5 @@ export default {
   
   "meet_developers": "Kenali Para Pengembang",
   "support_developers": "Dukung Para Pengembang",
-  "copyright": "© 2023 Flash Converter. Hak cipta dilindungi undang-undang."
+  "copyright": "© 2025 Flash Converter. Hak cipta dilindungi undang-undang."
 };
