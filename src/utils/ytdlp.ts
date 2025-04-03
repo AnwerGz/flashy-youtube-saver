@@ -188,6 +188,9 @@ export const downloadVideo = async (
       const permissionGranted = await requestStoragePermission();
       
       if (permissionGranted) {
+        // Ensure the directory exists
+        await createDirectory(outputPath);
+        
         // Start download with the plugin
         const downloadOptions = {
           url,
@@ -259,6 +262,7 @@ export const createDirectory = async (path: string): Promise<boolean> => {
         path: path,
         recursive: true
       });
+      console.log(`Created directory: ${path}`);
       return true;
     } catch (error) {
       console.error("Error creating directory:", error);

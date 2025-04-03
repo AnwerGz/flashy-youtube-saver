@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from '@/context/LanguageContext';
 import { Folder } from "lucide-react";
-import { downloadVideo } from '@/utils/ytdlp';
+import { downloadVideo, requestStoragePermission, createDirectory } from '@/utils/ytdlp';
 
 interface DownloadOptionsProps {
   isVisible: boolean;
@@ -23,10 +23,40 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
+  // Define default output paths based on format
+  const MP3_OUTPUT_PATH = '/storage/emulated/0/Music/Flash YTConverter';
+  const MP4_OUTPUT_PATH = '/storage/emulated/0/Movies/Flash YTConverter';
+
+  useEffect(() => {
+    // Request storage permission and create default directories when component mounts
+    const initializeApp = async () => {
+      const permissionGranted = await requestStoragePermission();
+      
+      if (permissionGranted) {
+        // Create both directories
+        await createDirectory(MP3_OUTPUT_PATH);
+        await createDirectory(MP4_OUTPUT_PATH);
+        
+        // Set default output path based on initial format
+        setOutputPath(format === 'mp3' ? MP3_OUTPUT_PATH : MP4_OUTPUT_PATH);
+      } else {
+        toast({
+          title: "Permission Denied",
+          description: "Storage permission is required for downloading videos",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    initializeApp();
+  }, []);
+
   const handleFormatChange = (value: string) => {
     setFormat(value);
     // Reset quality when format changes
     setQuality(value === 'mp3' ? '192kbps' : '720p');
+    // Update output path based on the selected format
+    setOutputPath(value === 'mp3' ? MP3_OUTPUT_PATH : MP4_OUTPUT_PATH);
   };
 
   const handleQualityChange = (value: string) => {
@@ -39,18 +69,24 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
       const isCapacitorAvailable = typeof (window as any).Capacitor !== 'undefined';
       
       if (isCapacitorAvailable) {
-        // In a real app with Capacitor installed, we would use the native plugins
-        toast({
-          title: "Mobile functionality",
-          description: "This would open a folder picker on mobile devices"
-        });
+        // For mobile devices - use native folder selection
+        const permissionGranted = await requestStoragePermission();
         
-        // For demonstration purposes, simulate selection of the Downloads folder
-        setOutputPath('/storage/emulated/0/Download');
-        toast({
-          title: "Folder selected",
-          description: "Files will be saved to your Downloads folder"
-        });
+        if (permissionGranted) {
+          // Let user select between default folders
+          const selectedPath = format === 'mp3' ? MP3_OUTPUT_PATH : MP4_OUTPUT_PATH;
+          setOutputPath(selectedPath);
+          toast({
+            title: "Folder selected",
+            description: `Files will be saved to ${selectedPath}`
+          });
+        } else {
+          toast({
+            title: "Permission Denied",
+            description: "Storage permission is required for selecting folders",
+            variant: "destructive"
+          });
+        }
       } else {
         // Web platform - use browser's directory picker API if available
         try {
@@ -66,7 +102,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
           console.error('Error selecting folder:', error);
           
           // Fallback for browsers that don't support directory picker
-          const fakeFolderName = "Downloads";
+          const fakeFolderName = format === 'mp3' ? "Music/Flash YTConverter" : "Movies/Flash YTConverter";
           setOutputPath(fakeFolderName);
           toast({
             title: "Folder selected (Demo)",
@@ -152,6 +188,7 @@ const DownloadOptions: React.FC<DownloadOptionsProps> = ({ isVisible, isPlaylist
           defaultValue={format} 
           onValueChange={handleFormatChange}
           className="flex flex-col sm:flex-row gap-4"
+          value={format}
         >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="mp3" id="mp3" />
