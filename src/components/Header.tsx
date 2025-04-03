@@ -61,13 +61,13 @@ const Header = () => {
                 <div className="w-16 h-16 bg-flash-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
                   {theme === 'dark' ? (
                     <img 
-                      src="/lovable-uploads/d89630eb-38d6-4620-b6a1-cf1e8ea985e2.png" 
+                      src="/thunder_flash3.png" 
                       alt="Thunder Icon" 
                       className="w-10 h-10"
                     />
                   ) : (
                     <img 
-                      src="/lovable-uploads/177c61a3-43a5-49e1-97cd-6d598161949c.png" 
+                      src="/thunder_flash2.png" 
                       alt="Thunder Icon" 
                       className="w-10 h-10"
                     />
@@ -75,7 +75,7 @@ const Header = () => {
                 </div>
                 <SheetTitle>{t('app_name')}</SheetTitle>
                 <SheetDescription>
-                  FlashYT v4.3.2025
+                  Flash v4.4.2025
                 </SheetDescription>
               </SheetHeader>
               

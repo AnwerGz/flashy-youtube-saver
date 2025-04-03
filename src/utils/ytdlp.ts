@@ -1,4 +1,3 @@
-
 // This file provides a wrapper around yt-dlp WebAssembly module
 
 import { toast } from "sonner";
@@ -57,11 +56,21 @@ const loadYtDlp = async (): Promise<boolean> => {
     if (isCapacitorNative()) {
       // Capacitor environment - check if YtDlpPlugin is available
       console.log("Running in Capacitor environment");
+      
+      // Check if the plugin is registered
+      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
+      if (!pluginsAvailable.YtDlpPlugin) {
+        console.log("YtDlpPlugin not available, running in demo mode");
+        addToLogHistory("YtDlp plugin not detected. Running in demo mode.", "warning");
+        toast.warning("Running in demo mode");
+        return false;
+      }
+      
       return true;
     } else {
       // Browser environment - not fully supported
       console.log("Running in browser environment");
-      toast.error("Full functionality requires the mobile app");
+      toast.warning("Full functionality requires the mobile app");
       addToLogHistory("Running in browser environment. Full functionality requires the mobile app", "warning");
       return false;
     }
@@ -168,12 +177,18 @@ export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
         };
       }
     } else if (isCapacitorNative()) {
-      // In a real app, we would call the native YT-DLP plugin here
-      const { YtDlpPlugin } = (window as any).Capacitor.Plugins;
-      addToLogHistory("Calling native YT-DLP plugin for video info", "info");
-      const result = await YtDlpPlugin.getVideoInfo({ url });
-      addToLogHistory("Successfully retrieved video info", "success");
-      return result.info;
+      try {
+        // In a real app, we would call the native YT-DLP plugin here
+        const { YtDlpPlugin } = (window as any).Capacitor.Plugins;
+        addToLogHistory("Calling native YT-DLP plugin for video info", "info");
+        const result = await YtDlpPlugin.getVideoInfo({ url });
+        addToLogHistory("Successfully retrieved video info", "success");
+        return result.info;
+      } catch (error) {
+        console.error("Error from YtDlpPlugin.getVideoInfo:", error);
+        addToLogHistory(`Plugin error: ${(error as Error).message}`, "error");
+        throw error;
+      }
     }
     
     return null;
@@ -201,8 +216,8 @@ export const downloadVideo = async (
     
     // Determine output path based on file type
     const baseOutputPath = isAudio 
-      ? "/storage/music/Flash YTConverter"
-      : "/storage/movies/Flash YTConverter";
+      ? "/storage/emulated/0/Music/Flash YTConverter"
+      : "/storage/emulated/0/Movies/Flash YTConverter";
     
     // Use provided outputPath if it's not empty, otherwise use default
     const finalOutputPath = outputPath || baseOutputPath;
@@ -234,15 +249,106 @@ export const downloadVideo = async (
       }, 200);
       return true;
     } else if (isCapacitorNative()) {
-      // In a real app, we would call the native YT-DLP plugin here
-      const { YtDlpPlugin } = (window as any).Capacitor.Plugins;
-      
-      // Request storage permission
-      const permissionGranted = await requestStoragePermission();
-      
-      if (permissionGranted) {
+      try {
+        // Get references to required Capacitor plugins
+        const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
+        
+        if (!pluginsAvailable.YtDlpPlugin || !pluginsAvailable.Permissions || !pluginsAvailable.Filesystem) {
+          toast.error("Required plugins not available");
+          addToLogHistory("Required Capacitor plugins not available", "error");
+          return false;
+        }
+        
+        const { YtDlpPlugin, Permissions, Filesystem } = pluginsAvailable;
+        
+        // Request storage permission using Android 13+ compatible approach
+        addToLogHistory("Checking storage permissions", "info");
+        
+        // First, check if we need READ_MEDIA_* permissions (Android 13+) or legacy STORAGE permission
+        let isAndroid13Plus = false;
+        
+        try {
+          // Check Android version if available
+          const deviceInfo = await pluginsAvailable.Device?.getInfo();
+          const androidVersion = deviceInfo?.androidSDKVersion || 0;
+          isAndroid13Plus = androidVersion >= 33; // Android 13 is API 33+
+          
+          addToLogHistory(`Detected Android SDK version: ${androidVersion}`, "info");
+        } catch (err) {
+          addToLogHistory("Could not detect Android version, using legacy permission model", "warning");
+        }
+        
+        let permissionGranted = false;
+        
+        if (isAndroid13Plus) {
+          // For Android 13+, request specific media permissions
+          try {
+            addToLogHistory("Requesting Android 13+ specific media permissions", "info");
+            
+            const result = await Permissions.requestPermissions({
+              permissions: ['android.permission.READ_MEDIA_AUDIO', 'android.permission.READ_MEDIA_VIDEO']
+            });
+            
+            // Check if either permission was granted
+            const audioGranted = result.permissions['android.permission.READ_MEDIA_AUDIO']?.granted || false;
+            const videoGranted = result.permissions['android.permission.READ_MEDIA_VIDEO']?.granted || false;
+            
+            permissionGranted = audioGranted && videoGranted;
+            
+            addToLogHistory(`Media permissions granted: ${permissionGranted}`, 
+              permissionGranted ? "success" : "warning");
+            
+          } catch (err) {
+            console.error("Error requesting media permissions:", err);
+            addToLogHistory(`Error requesting media permissions: ${(err as Error).message}`, "error");
+            
+            // Fall back to legacy storage permission as backup
+            try {
+              const legacyResult = await Permissions.requestPermissions({
+                permissions: ['storage']
+              });
+              
+              permissionGranted = legacyResult.permissions.storage?.granted || false;
+              
+              addToLogHistory(`Fallback storage permission granted: ${permissionGranted}`, 
+                permissionGranted ? "success" : "warning");
+                
+            } catch (fallbackErr) {
+              addToLogHistory(`Failed to request any storage permissions`, "error");
+            }
+          }
+        } else {
+          // For older Android versions, use legacy storage permission
+          try {
+            addToLogHistory("Requesting legacy storage permission", "info");
+            
+            const result = await Permissions.requestPermissions({
+              permissions: ['storage']
+            });
+            
+            permissionGranted = result.permissions.storage?.granted || false;
+            
+            addToLogHistory(`Storage permission granted: ${permissionGranted}`, 
+              permissionGranted ? "success" : "warning");
+              
+          } catch (err) {
+            console.error("Error requesting storage permission:", err);
+            addToLogHistory(`Error requesting storage permission: ${(err as Error).message}`, "error");
+          }
+        }
+        
+        if (!permissionGranted) {
+          toast.error("Storage permission denied. Cannot download without access to storage.");
+          addToLogHistory("Download failed: Storage permission denied", "error");
+          return false;
+        }
+        
         // Ensure the directory exists
-        await createDirectory(finalOutputPath);
+        try {
+          await createDirectory(finalOutputPath);
+        } catch (err) {
+          addToLogHistory(`Error creating directory: ${(err as Error).message}. Will attempt to continue.`, "warning");
+        }
         
         // Start download with the plugin
         const downloadOptions = {
@@ -261,48 +367,78 @@ export const downloadVideo = async (
           }
         } catch (error) {
           console.error("Could not get filename:", error);
+          addToLogHistory(`Could not get video title: ${(error as Error).message}. Using default filename.`, "warning");
         }
         
         // Subscribe to download progress
-        const handle = await YtDlpPlugin.addListener('downloadProgress', (data: { progress: number; message?: string }) => {
-          progressCallback(data.progress);
-          
-          // Log progress at 25%, 50%, 75% and 100%
-          if (Math.floor(data.progress) % 25 === 0 && Math.floor(data.progress) > 0) {
-            addToLogHistory(`Download progress: ${Math.floor(data.progress)}%`, "info");
-          }
-          
-          // Log ytdlp messages if available
-          if (data.message) {
-            addToLogHistory(`yt-dlp: ${data.message}`, "info");
-          }
-        });
-        
-        addToLogHistory("Starting download with yt-dlp...", "info");
-        const result = await YtDlpPlugin.download(downloadOptions);
-        
-        // Remove listener after download completes
-        await handle.remove();
-        
-        const endTime = new Date();
-        const formattedEndTime = endTime.toLocaleTimeString();
-        const duration = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
-        
-        if (result.success) {
-          const filePath = `${finalOutputPath}/${filename}${isAudio ? '.mp3' : '.mp4'}`;
-          addToLogHistory(`Download completed at ${formattedEndTime} (took ${duration} seconds)`, "success");
-          addToLogHistory(`File saved to: ${filePath}`, "success");
-        } else {
-          addToLogHistory(`Download failed at ${formattedEndTime}`, "error");
-          if (result.error) {
-            addToLogHistory(`Error: ${result.error}`, "error");
-          }
+        let progressHandle: any;
+        try {
+          progressHandle = await YtDlpPlugin.addListener('downloadProgress', (data: { progress: number; message?: string }) => {
+            progressCallback(data.progress);
+            
+            // Log progress at 25%, 50%, 75% and 100%
+            if (Math.floor(data.progress) % 25 === 0 && Math.floor(data.progress) > 0) {
+              addToLogHistory(`Download progress: ${Math.floor(data.progress)}%`, "info");
+            }
+            
+            // Log ytdlp messages if available
+            if (data.message) {
+              addToLogHistory(`yt-dlp: ${data.message}`, "info");
+            }
+          });
+        } catch (err) {
+          addToLogHistory(`Failed to add progress listener: ${(err as Error).message}. Download will continue without progress updates.`, "warning");
         }
         
-        return result.success;
-      } else {
-        toast.error("Storage permission is required for downloading");
-        addToLogHistory("Download failed: Storage permission denied", "error");
+        // Start the download
+        addToLogHistory("Starting download with yt-dlp...", "info");
+        
+        try {
+          const result = await YtDlpPlugin.download(downloadOptions);
+          
+          // Remove listener after download completes
+          if (progressHandle) {
+            await progressHandle.remove();
+          }
+          
+          const endTime = new Date();
+          const formattedEndTime = endTime.toLocaleTimeString();
+          const duration = Math.round((endTime.getTime() - startTime.getTime()) / 1000);
+          
+          if (result.success) {
+            const filePath = `${finalOutputPath}/${filename}${isAudio ? '.mp3' : '.mp4'}`;
+            addToLogHistory(`Download completed at ${formattedEndTime} (took ${duration} seconds)`, "success");
+            addToLogHistory(`File saved to: ${filePath}`, "success");
+            toast.success(`Download completed! File saved to: ${filePath}`);
+            return true;
+          } else {
+            addToLogHistory(`Download failed at ${formattedEndTime}`, "error");
+            if (result.error) {
+              addToLogHistory(`Error: ${result.error}`, "error");
+            }
+            toast.error("Download failed");
+            return false;
+          }
+        } catch (err) {
+          console.error("Download operation error:", err);
+          addToLogHistory(`Download operation error: ${(err as Error).message}`, "error");
+          toast.error("Download failed due to an error");
+          
+          // Remove listener if still active
+          if (progressHandle) {
+            try {
+              await progressHandle.remove();
+            } catch (cleanupErr) {
+              // Ignore cleanup errors
+            }
+          }
+          
+          return false;
+        }
+      } catch (err) {
+        console.error("General download error:", err);
+        addToLogHistory(`General download error: ${(err as Error).message}`, "error");
+        toast.error("Download process failed");
         return false;
       }
     }
@@ -319,34 +455,102 @@ export const downloadVideo = async (
 // Request storage permission for Android
 export const requestStoragePermission = async (): Promise<boolean> => {
   if (isCapacitorNative()) {
-    const { Permissions } = (window as any).Capacitor.Plugins;
     try {
-      // Check current permissions first
-      const checkResult = await Permissions.checkPermissions();
-      addToLogHistory("Checking storage permissions", "info");
+      addToLogHistory("Requesting storage permissions", "info");
       
-      if (checkResult.permissions.storage?.granted) {
-        addToLogHistory("Storage permission already granted", "info");
-        return true;
+      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
+      if (!pluginsAvailable.Permissions) {
+        addToLogHistory("Permissions plugin not available. Using demo mode.", "warning");
+        return true; // Return true in demo mode
       }
       
-      // Request permission if not granted
-      addToLogHistory("Requesting storage permission...", "info");
-      const result = await Permissions.requestPermissions({
-        permissions: ['storage']
-      });
+      const { Permissions } = pluginsAvailable;
       
-      addToLogHistory("Permission request result: " + (result.permissions.storage.granted ? "granted" : "denied"), 
-        result.permissions.storage.granted ? "success" : "warning");
+      // First, try to determine Android version
+      let isAndroid13Plus = false;
       
-      return result.permissions.storage.granted;
+      try {
+        if (pluginsAvailable.Device) {
+          const deviceInfo = await pluginsAvailable.Device.getInfo();
+          const androidVersion = deviceInfo?.androidSDKVersion || 0;
+          isAndroid13Plus = androidVersion >= 33; // Android 13 is API 33+
+          
+          addToLogHistory(`Detected Android SDK version: ${androidVersion}`, "info");
+        }
+      } catch (err) {
+        addToLogHistory("Could not detect Android version, using legacy permission model", "warning");
+      }
+      
+      let permissionResult;
+      
+      if (isAndroid13Plus) {
+        // For Android 13+, we need specific media permissions
+        addToLogHistory("Requesting Android 13+ specific media permissions", "info");
+        
+        try {
+          permissionResult = await Permissions.requestPermissions({
+            permissions: ['android.permission.READ_MEDIA_AUDIO', 'android.permission.READ_MEDIA_VIDEO', 'android.permission.READ_MEDIA_IMAGES']
+          });
+          
+          // Check if the required permissions were granted
+          const audioGranted = permissionResult.permissions['android.permission.READ_MEDIA_AUDIO']?.granted || false;
+          const videoGranted = permissionResult.permissions['android.permission.READ_MEDIA_VIDEO']?.granted || false;
+          
+          const granted = audioGranted && videoGranted;
+          
+          addToLogHistory(`Media permissions request result: ${granted ? "granted" : "denied"}`, 
+            granted ? "success" : "warning");
+            
+          return granted;
+        } catch (err) {
+          addToLogHistory(`Error requesting Android 13+ permissions: ${(err as Error).message}. Trying legacy permission.`, "warning");
+          
+          // Fall back to legacy permission
+          try {
+            permissionResult = await Permissions.requestPermissions({
+              permissions: ['storage']
+            });
+            
+            const granted = permissionResult.permissions.storage?.granted || false;
+            
+            addToLogHistory(`Fallback storage permission result: ${granted ? "granted" : "denied"}`, 
+              granted ? "success" : "warning");
+              
+            return granted;
+          } catch (fallbackErr) {
+            addToLogHistory(`Failed to request any permissions: ${(fallbackErr as Error).message}`, "error");
+            return false;
+          }
+        }
+      } else {
+        // For pre-Android 13 devices
+        addToLogHistory("Requesting standard storage permission", "info");
+        
+        try {
+          permissionResult = await Permissions.requestPermissions({
+            permissions: ['storage']
+          });
+          
+          // Check if permissions were granted
+          const granted = permissionResult.permissions.storage?.granted || false;
+          
+          addToLogHistory(`Storage permission request result: ${granted ? "granted" : "denied"}`, 
+            granted ? "success" : "warning");
+            
+          return granted;
+        } catch (err) {
+          addToLogHistory(`Error requesting storage permission: ${(err as Error).message}`, "error");
+          return false;
+        }
+      }
     } catch (error) {
-      console.error("Error requesting storage permission:", error);
+      console.error("Error in requestStoragePermission:", error);
       addToLogHistory("Error requesting storage permission: " + (error as Error).message, "error");
       return false;
     }
   }
-  // In browser, we'll assume it's granted
+  
+  // In browser or if Capacitor isn't available, assume it's granted
   addToLogHistory("Browser environment, assuming storage permission granted", "info");
   return true;
 };
@@ -355,22 +559,48 @@ export const requestStoragePermission = async (): Promise<boolean> => {
 export const createDirectory = async (path: string): Promise<boolean> => {
   if (isCapacitorNative()) {
     try {
-      const { Filesystem } = (window as any).Capacitor.Plugins;
+      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
+      if (!pluginsAvailable.Filesystem) {
+        addToLogHistory("Filesystem plugin not available. Using demo mode.", "warning");
+        return true; // Return true in demo mode
+      }
+      
+      const { Filesystem } = pluginsAvailable;
       addToLogHistory(`Creating directory: ${path}`, "info");
       
-      await Filesystem.mkdir({
-        path: path,
-        recursive: true
-      });
-      
-      addToLogHistory(`Successfully created directory: ${path}`, "success");
-      return true;
+      try {
+        await Filesystem.mkdir({
+          path: path,
+          recursive: true
+        });
+        
+        addToLogHistory(`Successfully created directory: ${path}`, "success");
+        return true;
+      } catch (err: any) {
+        // Check if directory exists error (common error code when directory already exists)
+        if (err.message && (
+            err.message.includes('exists') || 
+            err.message.includes('EEXIST') || 
+            err.code === 'EEXIST' || 
+            err.code === 'ERROR_DIRECTORY_EXISTS')
+          ) {
+          addToLogHistory(`Directory already exists: ${path}`, "info");
+          return true;
+        }
+        
+        // Other error
+        console.error("Error creating directory:", err);
+        addToLogHistory(`Error creating directory: ${path}: ${err.message}`, "error");
+        return false;
+      }
     } catch (error) {
-      console.error("Error creating directory:", error);
-      addToLogHistory("Error creating directory: " + (error as Error).message, "error");
+      console.error("Error in createDirectory:", error);
+      addToLogHistory("Error accessing filesystem: " + (error as Error).message, "error");
       return false;
     }
   }
+  
+  // In browser environment
   addToLogHistory("Browser environment, skipping directory creation", "info");
   return true;
 };
@@ -379,22 +609,42 @@ export const createDirectory = async (path: string): Promise<boolean> => {
 export const listDirectories = async (): Promise<string[]> => {
   if (isCapacitorNative()) {
     try {
-      const { Filesystem } = (window as any).Capacitor.Plugins;
+      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
+      if (!pluginsAvailable.Filesystem) {
+        addToLogHistory("Filesystem plugin not available. Using demo mode.", "warning");
+        return ["Downloads", "Movies", "Music"]; // Return demo directories
+      }
+      
+      const { Filesystem } = pluginsAvailable;
       addToLogHistory("Listing available directories", "info");
       
-      const result = await Filesystem.readdir({
-        path: "/"
-      });
-      
-      addToLogHistory(`Found ${result.files.length} directories`, "info");
-      return result.files;
+      try {
+        // Try to list top-level directories
+        const result = await Filesystem.readdir({
+          path: "/"
+        });
+        
+        addToLogHistory(`Found ${result.files.length} directories`, "info");
+        return result.files;
+      } catch (err) {
+        // If we can't access root, try common Android directories
+        addToLogHistory(`Could not list directories: ${(err as Error).message}. Returning default options.`, "warning");
+        
+        // Return common Android directories
+        return [
+          "/storage/emulated/0/Download",
+          "/storage/emulated/0/Music",
+          "/storage/emulated/0/Movies",
+          "/storage/emulated/0/DCIM"
+        ];
+      }
     } catch (error) {
       console.error("Error listing directories:", error);
       addToLogHistory("Error listing directories: " + (error as Error).message, "error");
-      return [];
+      return ["Downloads"];
     }
   }
-  return ["Downloads"];
+  return ["Downloads", "Movies", "Music"];
 };
 
 // Initialize default directories when the app is first opened
@@ -410,12 +660,14 @@ export const initializeDefaultDirectories = async (): Promise<void> => {
         
         if (permissionGranted) {
           // Create default directories
-          await createDirectory("/storage/music/Flash YTConverter");
-          await createDirectory("/storage/movies/Flash YTConverter");
+          await createDirectory("/storage/emulated/0/Music/Flash YTConverter");
+          await createDirectory("/storage/emulated/0/Movies/Flash YTConverter");
           
           // Mark as initialized
           localStorage.setItem('directories_initialized', 'true');
           addToLogHistory("Default directories successfully initialized", "success");
+        } else {
+          addToLogHistory("Could not initialize directories: Permission denied", "warning");
         }
       }
     } catch (error) {
@@ -424,4 +676,3 @@ export const initializeDefaultDirectories = async (): Promise<void> => {
     }
   }
 };
-

@@ -12,7 +12,6 @@ import NotFound from "./pages/NotFound";
 import ExportGuide from "./pages/ExportGuide";
 import LogHistory from "./pages/LogHistory";
 import { initializeDefaultDirectories } from "./utils/ytdlp";
-import { toast } from "./components/ui/use-toast";
 import { useLogHistory } from "./pages/LogHistory";
 
 const queryClient = new QueryClient();
@@ -29,7 +28,7 @@ const AppContent = () => {
       } catch (error) {
         // Don't show the Capacitor Plugin error to the user
         // Just log it for debugging purposes
-        addLog(`Storage initialization: Using browser storage instead of native storage.`, 'info');
+        addLog("Storage initialization: Using browser storage instead of native storage.", 'info');
         console.log("Storage initialization: Using browser storage. Native storage may not be available in this environment.");
       }
     };
