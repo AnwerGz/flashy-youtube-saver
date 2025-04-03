@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, Moon, Sun, Globe, HomeIcon, ClipboardList } from 'lucide-react';
+import { Moon, Sun, Globe, HomeIcon, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage, LanguageKey, languages } from '@/context/LanguageContext';
@@ -57,10 +57,26 @@ const Header = () => {
             </SheetTrigger>
             
             <SheetContent side="left" className="w-64 sm:max-w-sm">
-              <SheetHeader className="pb-6">
+              <SheetHeader className="pb-6 flex flex-col items-center">
+                <div className="w-16 h-16 bg-flash-500 rounded-full flex items-center justify-center mb-4 overflow-hidden">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="32" 
+                    height="32" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="text-white"
+                  >
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                </div>
                 <SheetTitle>{t('app_name')}</SheetTitle>
                 <SheetDescription>
-                  {t('flash_converter_description')}
+                  FlashYT v4.3.2025
                 </SheetDescription>
               </SheetHeader>
               
@@ -91,10 +107,6 @@ const Header = () => {
               </div>
             </SheetContent>
           </Sheet>
-          
-          <h1 className="text-xl font-bold text-flash-800 dark:text-flash-300">
-            {t('app_name')}
-          </h1>
         </div>
         
         <div className="flex items-center gap-2">
