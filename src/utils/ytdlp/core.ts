@@ -1,9 +1,10 @@
 
 import { toast } from "sonner";
+import { Capacitor } from '@capacitor/core';
 
 // Check if we're running in a Capacitor environment
 export const isCapacitorNative = (): boolean => {
-  return typeof (window as any).Capacitor !== 'undefined';
+  return Capacitor.isNativePlatform();
 };
 
 // Create log history methods
@@ -25,8 +26,7 @@ export const addToLogHistory = (message: string, type: 'info' | 'success' | 'err
   }
 };
 
-// Load the YTDLP WebAssembly module if in browser environment
-// In Capacitor, we'll use native bindings
+// Load the YTDLP plugin if in Capacitor environment
 export const loadYtDlp = async (): Promise<boolean> => {
   try {
     if (isCapacitorNative()) {
@@ -34,8 +34,7 @@ export const loadYtDlp = async (): Promise<boolean> => {
       console.log("Running in Capacitor environment");
       
       // Check if the plugin is registered
-      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
-      if (!pluginsAvailable.YtDlpPlugin) {
+      if (!Capacitor.Plugins.YtDlpPlugin) {
         console.log("YtDlpPlugin not available, running in demo mode");
         addToLogHistory("YtDlp plugin not detected. Running in demo mode.", "warning");
         toast.warning("Running in demo mode");

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { useEffect } from "react";
@@ -14,7 +14,16 @@ import LogHistory from "./pages/LogHistory";
 import { initializeDefaultDirectories } from "./utils/ytdlp";
 import { useLogHistory } from "./pages/LogHistory";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Disable network-based refetching to support offline mode
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: false
+    }
+  }
+});
 
 // Create a wrapper component to use hooks
 const AppContent = () => {
@@ -37,7 +46,7 @@ const AppContent = () => {
   }, [addLog]);
   
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/logs" element={<LogHistory />} />
@@ -45,7 +54,7 @@ const AppContent = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 

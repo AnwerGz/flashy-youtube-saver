@@ -5,6 +5,7 @@ import { getDemoVideoInfo, simulateDownload } from './demo';
 import { toast } from 'sonner';
 import { createDirectory } from './filesystem';
 import { requestStoragePermission } from './permissions';
+import { Capacitor } from '@capacitor/core';
 
 // Extract video information using yt-dlp
 export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
@@ -17,9 +18,14 @@ export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
       return getDemoVideoInfo(url);
     } else if (isCapacitorNative()) {
       try {
-        // In a real app, we would call the native YT-DLP plugin here
-        const { YtDlpPlugin } = (window as any).Capacitor.Plugins;
+        // Call the native YT-DLP plugin
+        if (!Capacitor.Plugins.YtDlpPlugin) {
+          throw new Error("YtDlpPlugin not available");
+        }
+        
+        const { YtDlpPlugin } = Capacitor.Plugins;
         addToLogHistory("Calling native YT-DLP plugin for video info", "info");
+        
         const result = await YtDlpPlugin.getVideoInfo({ url });
         addToLogHistory("Successfully retrieved video info", "success");
         return result.info;
@@ -71,92 +77,18 @@ export const downloadVideo = async (
       return simulateDownload(startTime, progressCallback, isAudio, finalOutputPath);
     } else if (isCapacitorNative()) {
       try {
-        // Get references to required Capacitor plugins
-        const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
-        
-        if (!pluginsAvailable.YtDlpPlugin || !pluginsAvailable.Permissions || !pluginsAvailable.Filesystem) {
+        // Check if required plugins are available
+        if (!Capacitor.isPluginAvailable('YtDlpPlugin') || 
+            !Capacitor.isPluginAvailable('Permissions') || 
+            !Capacitor.isPluginAvailable('Filesystem')) {
           toast.error("Required plugins not available");
           addToLogHistory("Required Capacitor plugins not available", "error");
           return false;
         }
         
-        const { YtDlpPlugin, Permissions, Filesystem } = pluginsAvailable;
-        
-        // Request storage permission using Android 13+ compatible approach
+        // Request storage permission
         addToLogHistory("Checking storage permissions", "info");
-        
-        // First, check if we need READ_MEDIA_* permissions (Android 13+) or legacy STORAGE permission
-        let isAndroid13Plus = false;
-        
-        try {
-          // Check Android version if available
-          const deviceInfo = await pluginsAvailable.Device?.getInfo();
-          const androidVersion = deviceInfo?.androidSDKVersion || 0;
-          isAndroid13Plus = androidVersion >= 33; // Android 13 is API 33+
-          
-          addToLogHistory(`Detected Android SDK version: ${androidVersion}`, "info");
-        } catch (err) {
-          addToLogHistory("Could not detect Android version, using legacy permission model", "warning");
-        }
-        
-        let permissionGranted = false;
-        
-        if (isAndroid13Plus) {
-          // For Android 13+, request specific media permissions
-          try {
-            addToLogHistory("Requesting Android 13+ specific media permissions", "info");
-            
-            const result = await Permissions.requestPermissions({
-              permissions: ['android.permission.READ_MEDIA_AUDIO', 'android.permission.READ_MEDIA_VIDEO']
-            });
-            
-            // Check if either permission was granted
-            const audioGranted = result.permissions['android.permission.READ_MEDIA_AUDIO']?.granted || false;
-            const videoGranted = result.permissions['android.permission.READ_MEDIA_VIDEO']?.granted || false;
-            
-            permissionGranted = audioGranted && videoGranted;
-            
-            addToLogHistory(`Media permissions granted: ${permissionGranted}`, 
-              permissionGranted ? "success" : "warning");
-            
-          } catch (err) {
-            console.error("Error requesting media permissions:", err);
-            addToLogHistory(`Error requesting media permissions: ${(err as Error).message}`, "error");
-            
-            // Fall back to legacy storage permission as backup
-            try {
-              const legacyResult = await Permissions.requestPermissions({
-                permissions: ['storage']
-              });
-              
-              permissionGranted = legacyResult.permissions.storage?.granted || false;
-              
-              addToLogHistory(`Fallback storage permission granted: ${permissionGranted}`, 
-                permissionGranted ? "success" : "warning");
-                
-            } catch (fallbackErr) {
-              addToLogHistory(`Failed to request any storage permissions`, "error");
-            }
-          }
-        } else {
-          // For older Android versions, use legacy storage permission
-          try {
-            addToLogHistory("Requesting legacy storage permission", "info");
-            
-            const result = await Permissions.requestPermissions({
-              permissions: ['storage']
-            });
-            
-            permissionGranted = result.permissions.storage?.granted || false;
-            
-            addToLogHistory(`Storage permission granted: ${permissionGranted}`, 
-              permissionGranted ? "success" : "warning");
-              
-          } catch (err) {
-            console.error("Error requesting storage permission:", err);
-            addToLogHistory(`Error requesting storage permission: ${(err as Error).message}`, "error");
-          }
-        }
+        const permissionGranted = await requestStoragePermission();
         
         if (!permissionGranted) {
           toast.error("Storage permission denied. Cannot download without access to storage.");
@@ -171,14 +103,7 @@ export const downloadVideo = async (
           addToLogHistory(`Error creating directory: ${(err as Error).message}. Will attempt to continue.`, "warning");
         }
         
-        // Start download with the plugin
-        const downloadOptions = {
-          url,
-          format,
-          outputPath: finalOutputPath,
-          quality,
-          isAudio
-        };
+        const { YtDlpPlugin } = Capacitor.Plugins;
         
         // Get filename from info if possible
         try {
@@ -190,6 +115,15 @@ export const downloadVideo = async (
           console.error("Could not get filename:", error);
           addToLogHistory(`Could not get video title: ${(error as Error).message}. Using default filename.`, "warning");
         }
+        
+        // Start download with the plugin
+        const downloadOptions = {
+          url,
+          format,
+          outputPath: finalOutputPath,
+          quality,
+          isAudio
+        };
         
         // Subscribe to download progress
         let progressHandle: any;

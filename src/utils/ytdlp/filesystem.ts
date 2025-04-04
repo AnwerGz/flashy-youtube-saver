@@ -1,16 +1,17 @@
+
 import { isCapacitorNative, addToLogHistory } from './core';
+import { Capacitor } from '@capacitor/core';
 
 // Create directories for output
 export const createDirectory = async (path: string): Promise<boolean> => {
   if (isCapacitorNative()) {
     try {
-      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
-      if (!pluginsAvailable.Filesystem) {
+      if (!Capacitor.isPluginAvailable('Filesystem')) {
         addToLogHistory("Filesystem plugin not available. Using demo mode.", "warning");
         return true; // Return true in demo mode
       }
       
-      const { Filesystem } = pluginsAvailable;
+      const { Filesystem } = Capacitor.Plugins;
       addToLogHistory(`Creating directory: ${path}`, "info");
       
       try {
@@ -54,13 +55,12 @@ export const createDirectory = async (path: string): Promise<boolean> => {
 export const listDirectories = async (): Promise<string[]> => {
   if (isCapacitorNative()) {
     try {
-      const pluginsAvailable = (window as any).Capacitor?.Plugins || {};
-      if (!pluginsAvailable.Filesystem) {
+      if (!Capacitor.isPluginAvailable('Filesystem')) {
         addToLogHistory("Filesystem plugin not available. Using demo mode.", "warning");
         return ["Downloads", "Movies", "Music"]; // Return demo directories
       }
       
-      const { Filesystem } = pluginsAvailable;
+      const { Filesystem } = Capacitor.Plugins;
       addToLogHistory("Listing available directories", "info");
       
       try {

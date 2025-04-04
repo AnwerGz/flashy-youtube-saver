@@ -1,35 +1,33 @@
 
+import { PluginListenerHandle, PermissionState } from '@capacitor/core';
+
 // Type definitions for Capacitor custom plugins
-interface PluginListenerHandle {
-  remove: () => Promise<void>;
+interface PluginCallResult {
+  [key: string]: any;
 }
 
 interface PermissionStatus {
-  storage: {
-    granted: boolean;
-  };
+  storage: PermissionState;
+  [key: string]: PermissionState;
 }
 
 declare module '@capacitor/core' {
+  interface PermissionType {
+    // Standard permission
+    storage: PermissionState;
+    
+    // Android 13+ permissions
+    'android.permission.READ_MEDIA_AUDIO': PermissionState;
+    'android.permission.READ_MEDIA_VIDEO': PermissionState;
+    'android.permission.READ_MEDIA_IMAGES': PermissionState;
+    'android.permission.READ_EXTERNAL_STORAGE': PermissionState;
+    'android.permission.WRITE_EXTERNAL_STORAGE': PermissionState;
+  }
+  
   interface PluginRegistry {
     YtDlpPlugin: YtDlpPluginPlugin;
     FFmpegPlugin: FFmpegPluginPlugin;
-    Permissions: PermissionsPlugin;
-    Filesystem: FilesystemPlugin;
   }
-}
-
-// Permissions Plugin interface
-interface PermissionsPlugin {
-  requestPermissions(options: { permissions: string[] }): Promise<{ permissions: PermissionStatus }>;
-  checkPermissions(): Promise<{ permissions: PermissionStatus }>;
-}
-
-// Filesystem Plugin interface
-interface FilesystemPlugin {
-  mkdir(options: { path: string; recursive: boolean }): Promise<void>;
-  getUri(options: { path: string }): Promise<{ uri: string }>;
-  readdir(options: { path: string }): Promise<{ files: string[] }>;
 }
 
 // YT-DLP Plugin interface
@@ -41,10 +39,10 @@ interface YtDlpPluginPlugin {
     outputPath: string,
     quality: string,
     isAudio: boolean
-  }): Promise<{ success: boolean, path: string }>;
+  }): Promise<{ success: boolean, path?: string, error?: string }>;
   addListener(
     eventName: 'downloadProgress',
-    listenerFunc: (data: { progress: number }) => void
+    listenerFunc: (data: { progress: number, message?: string }) => void
   ): Promise<PluginListenerHandle>;
 }
 
@@ -55,7 +53,7 @@ interface FFmpegPluginPlugin {
     outputPath: string,
     format: string,
     quality: string
-  }): Promise<{ success: boolean, path: string }>;
+  }): Promise<{ success: boolean, path?: string, error?: string }>;
   addListener(
     eventName: 'conversionProgress',
     listenerFunc: (data: { progress: number }) => void
