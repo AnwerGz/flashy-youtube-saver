@@ -1,7 +1,5 @@
-
 import { isCapacitorNative, addToLogHistory } from './core';
-import { Capacitor } from '@capacitor/core';
-import { registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
 // Create directories for output
 export const createDirectory = async (path: string): Promise<boolean> => {

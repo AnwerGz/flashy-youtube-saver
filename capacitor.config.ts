@@ -5,6 +5,12 @@ const config: CapacitorConfig = {
   appId: 'com.dejavi.flash',
   appName: 'Flash YTConverter',
   webDir: 'dist',
+  server: {
+    androidScheme: 'https',
+    // Remove localhost URL and use the bundled web assets
+    // This ensures the app works offline
+    iosScheme: 'capacitor'
+  },
   plugins: {
     Permissions: {
       requestPermissions: [
@@ -16,21 +22,21 @@ const config: CapacitorConfig = {
       ]
     },
     YtDlpPlugin: {
-      // Arahkan ke path binary resmi
-      binaryPath: "src/utils/bin/yt-dlp"
+      // Point to the correct relative path to binaries in the app's assets
+      binaryPath: "assets/bin/yt-dlp"
     },
     FFmpegPlugin: {
-      // Arahkan ke path binary resmi
-      binaryPath: "src/utils/bin/ffmpeg"
+      // Point to the correct relative path to binaries in the app's assets
+      binaryPath: "assets/bin/ffmpeg"
     }
   },
   android: {
-    // Pastikan kita menggunakan versi Gradle yang kompatibel
+    // Ensure we're using a version of Gradle that's compatible
     minSdkVersion: 22,
-    // Ini akan berfungsi dengan JDK 21
+    // This will work with JDK 21
     buildToolsVersion: "33.0.2",
     gradleVersion: "8.0.0",
-    // Tambahkan deskripsi izin untuk dukungan Android 13+ yang lebih baik
+    // Add permission descriptions for better Android 13+ support
     permissionRequestDescription: {
       "android.permission.READ_MEDIA_AUDIO": "Akses untuk menyimpan file audio",
       "android.permission.READ_MEDIA_VIDEO": "Akses untuk menyimpan file video",

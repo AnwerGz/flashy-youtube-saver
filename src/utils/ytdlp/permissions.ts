@@ -1,6 +1,5 @@
 
-import { Capacitor } from '@capacitor/core';
-import { registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { addToLogHistory } from './core';
 
 // Request storage permission from the user

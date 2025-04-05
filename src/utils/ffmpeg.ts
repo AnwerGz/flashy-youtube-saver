@@ -1,8 +1,7 @@
 
 import { toast } from "sonner";
 import { requestStoragePermission } from "./ytdlp"; 
-import { Capacitor } from '@capacitor/core';
-import { registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
 // Check if we're running in a Capacitor environment
 const isCapacitorNative = (): boolean => {

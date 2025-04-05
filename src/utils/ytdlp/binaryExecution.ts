@@ -1,14 +1,13 @@
 
-import { Capacitor } from '@capacitor/core';
-import { registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { isCapacitorNative, addToLogHistory } from './core';
 
-// Definisikan path untuk file binary resmi
+// Define paths for official binary files
 const BINARY_DIR = "utils/bin";
 const YT_DLP_BINARY = "yt-dlp";
 const FFMPEG_BINARY = "ffmpeg";
 
-// Interface untuk hasil eksekusi
+// Interface for execution results
 interface ExecResult {
   success: boolean;
   output?: string;
@@ -16,25 +15,25 @@ interface ExecResult {
   exitCode?: number;
 }
 
-// Salin file binary dari assets ke direktori pribadi aplikasi
+// Copy binary files from assets to app's private directory
 export const copyBinaries = async (): Promise<boolean> => {
   if (!isCapacitorNative()) {
-    // Di lingkungan browser, simulasikan keberhasilan
-    addToLogHistory("Lingkungan browser, melewati penyalinan binary", "info");
+    // In browser environment, simulate success
+    addToLogHistory("Browser environment, skipping binary copying", "info");
     return true;
   }
   
   try {
     if (!Capacitor.isPluginAvailable('Filesystem')) {
-      addToLogHistory("Plugin Filesystem tidak tersedia", "warning");
+      addToLogHistory("Filesystem plugin not available", "warning");
       return false;
     }
     
     const Filesystem = registerPlugin<FilesystemPlugin>('Filesystem');
     
-    addToLogHistory("Memeriksa file binary di direktori aplikasi", "info");
+    addToLogHistory("Checking binary files in app directory", "info");
     
-    // Buat direktori tujuan
+    // Create destination directory
     try {
       await Filesystem.mkdir({
         path: BINARY_DIR,
@@ -42,14 +41,14 @@ export const copyBinaries = async (): Promise<boolean> => {
         recursive: true
       });
     } catch (err) {
-      // Abaikan error jika direktori sudah ada
-      addToLogHistory("Direktori binary sudah ada atau tidak dapat dibuat", "info");
+      // Ignore error if directory already exists
+      addToLogHistory("Binary directory already exists or couldn't be created", "info");
     }
     
-    // Fungsi untuk menyalin binary dari assets ke direktori aplikasi
+    // Function to copy binary from assets to app directory
     const copyBinary = async (binaryName: string): Promise<boolean> => {
       try {
-        // Periksa apakah binary sudah ada di direktori aplikasi
+        // Check if binary already exists in app directory
         try {
           const stat = await Filesystem.stat({
             path: `${BINARY_DIR}/${binaryName}`,
@@ -57,98 +56,98 @@ export const copyBinaries = async (): Promise<boolean> => {
           });
           
           if (stat) {
-            addToLogHistory(`${binaryName} sudah ada di direktori aplikasi`, "info");
-            // Atur izin eksekusi
+            addToLogHistory(`${binaryName} already exists in app directory`, "info");
+            // Set execution permissions
             await execCommand(`chmod +x ${BINARY_DIR}/${binaryName}`);
             return true;
           }
         } catch (statErr) {
-          // File tidak ada, kita perlu menyalinnya
-          addToLogHistory(`${binaryName} tidak ditemukan, akan disalin dari assets`, "info");
+          // File doesn't exist, we need to copy it
+          addToLogHistory(`${binaryName} not found, will copy from assets`, "info");
         }
         
-        // Baca binary dari path resmi
+        // Read binary from official path
         const asset = await Filesystem.readFile({
           path: `src/utils/bin/${binaryName}`,
           directory: 'APPLICATION'
         });
         
-        // Tulis binary ke direktori aplikasi
+        // Write binary to app directory
         await Filesystem.writeFile({
           path: `${BINARY_DIR}/${binaryName}`,
           data: asset.data,
           directory: 'APPLICATION'
         });
         
-        // Atur izin eksekusi
+        // Set execution permissions
         await execCommand(`chmod +x ${BINARY_DIR}/${binaryName}`);
         
-        addToLogHistory(`Berhasil menyalin ${binaryName} ke direktori aplikasi`, "success");
+        addToLogHistory(`Successfully copied ${binaryName} to app directory`, "success");
         return true;
       } catch (err) {
-        addToLogHistory(`Gagal menyalin ${binaryName}: ${(err as Error).message}`, "error");
+        addToLogHistory(`Failed to copy ${binaryName}: ${(err as Error).message}`, "error");
         return false;
       }
     };
     
-    // Salin kedua binary
+    // Copy both binaries
     const ytDlpCopied = await copyBinary(YT_DLP_BINARY);
     const ffmpegCopied = await copyBinary(FFMPEG_BINARY);
     
     return ytDlpCopied && ffmpegCopied;
   } catch (error) {
-    addToLogHistory(`Gagal menyalin binary: ${(error as Error).message}`, "error");
+    addToLogHistory(`Failed to copy binaries: ${(error as Error).message}`, "error");
     return false;
   }
 };
 
-// Eksekusi perintah shell
+// Execute shell command
 const execCommand = async (command: string): Promise<ExecResult> => {
   if (!isCapacitorNative()) {
-    // Simulasi eksekusi di browser
-    addToLogHistory(`[MOCK] Mengeksekusi perintah: ${command}`, "info");
+    // Simulate execution in browser
+    addToLogHistory(`[MOCK] Executing command: ${command}`, "info");
     return { success: true, output: "Mock execution successful", exitCode: 0 };
   }
   
   try {
-    // Periksa apakah kita memiliki plugin Shell yang tersedia
+    // Check if we have the Shell plugin available
     if (!Capacitor.isPluginAvailable('Shell')) {
-      addToLogHistory("Plugin Shell tidak tersedia", "error");
-      return { success: false, error: "Plugin Shell tidak tersedia" };
+      addToLogHistory("Shell plugin not available", "error");
+      return { success: false, error: "Shell plugin not available" };
     }
     
     const Shell = registerPlugin<ShellPlugin>('Shell');
-    addToLogHistory(`Mengeksekusi perintah: ${command}`, "info");
+    addToLogHistory(`Executing command: ${command}`, "info");
     
     const result = await Shell.execute({ command });
     
     if (result.exitCode === 0) {
-      addToLogHistory("Perintah berhasil dieksekusi", "success");
+      addToLogHistory("Command executed successfully", "success");
       return { 
         success: true, 
         output: result.output, 
         exitCode: result.exitCode 
       };
     } else {
-      addToLogHistory(`Perintah gagal dengan kode keluar ${result.exitCode}`, "error");
+      addToLogHistory(`Command failed with exit code ${result.exitCode}`, "error");
       return { 
         success: false, 
-        error: result.error || `Perintah gagal dengan kode keluar ${result.exitCode}`,
+        error: result.error || `Command failed with exit code ${result.exitCode}`,
         output: result.output,
         exitCode: result.exitCode 
       };
     }
   } catch (error) {
-    addToLogHistory(`Gagal mengeksekusi perintah: ${(error as Error).message}`, "error");
+    addToLogHistory(`Failed to execute command: ${(error as Error).message}`, "error");
     return { success: false, error: (error as Error).message };
   }
 };
 
-// Eksekusi yt-dlp dengan argumen
+// Execute yt-dlp with arguments
 export const execYtDlp = async (args: string[]): Promise<ExecResult> => {
   if (!isCapacitorNative()) {
-    // Simulasi eksekusi di browser
-    addToLogHistory(`[MOCK] Mengeksekusi yt-dlp dengan argumen: ${args.join(' ')}`, "info");
+    // Simulate execution in browser
+    addToLogHistory(`[MOCK] Executing yt-dlp with arguments: ${args.join(' ')}`, "info");
     return { success: true, output: "Mock yt-dlp execution successful", exitCode: 0 };
   }
   
@@ -158,16 +157,16 @@ export const execYtDlp = async (args: string[]): Promise<ExecResult> => {
     
     return await execCommand(command);
   } catch (error) {
-    addToLogHistory(`Gagal mengeksekusi yt-dlp: ${(error as Error).message}`, "error");
+    addToLogHistory(`Failed to execute yt-dlp: ${(error as Error).message}`, "error");
     return { success: false, error: (error as Error).message };
   }
 };
 
-// Eksekusi ffmpeg dengan argumen
+// Execute ffmpeg with arguments
 export const execFFmpeg = async (args: string[]): Promise<ExecResult> => {
   if (!isCapacitorNative()) {
-    // Simulasi eksekusi di browser
-    addToLogHistory(`[MOCK] Mengeksekusi ffmpeg dengan argumen: ${args.join(' ')}`, "info");
+    // Simulate execution in browser
+    addToLogHistory(`[MOCK] Executing ffmpeg with arguments: ${args.join(' ')}`, "info");
     return { success: true, output: "Mock ffmpeg execution successful", exitCode: 0 };
   }
   
@@ -177,7 +176,7 @@ export const execFFmpeg = async (args: string[]): Promise<ExecResult> => {
     
     return await execCommand(command);
   } catch (error) {
-    addToLogHistory(`Gagal mengeksekusi ffmpeg: ${(error as Error).message}`, "error");
+    addToLogHistory(`Failed to execute ffmpeg: ${(error as Error).message}`, "error");
     return { success: false, error: (error as Error).message };
   }
 };

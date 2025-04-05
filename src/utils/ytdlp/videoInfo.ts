@@ -3,8 +3,7 @@ import { VideoInfo } from './types';
 import { isCapacitorNative, loadYtDlp, addToLogHistory } from './core';
 import { getDemoVideoInfo } from './demo';
 import { toast } from 'sonner';
-import { Capacitor } from '@capacitor/core';
-import { registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
 // Extract video information using yt-dlp
 export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
