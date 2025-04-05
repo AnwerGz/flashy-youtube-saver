@@ -16,26 +16,26 @@ const config: CapacitorConfig = {
       ]
     },
     YtDlpPlugin: {
-      // Point to the official binary path
+      // Arahkan ke path binary resmi
       binaryPath: "src/utils/bin/yt-dlp"
     },
     FFmpegPlugin: {
-      // Point to the official binary path
+      // Arahkan ke path binary resmi
       binaryPath: "src/utils/bin/ffmpeg"
     }
   },
   android: {
-    // Make sure we're using a compatible Gradle version
+    // Pastikan kita menggunakan versi Gradle yang kompatibel
     minSdkVersion: 22,
-    // This will work with JDK 21
+    // Ini akan berfungsi dengan JDK 21
     buildToolsVersion: "33.0.2",
     gradleVersion: "8.0.0",
-    // Add permission descriptions for better Android 13+ support
+    // Tambahkan deskripsi izin untuk dukungan Android 13+ yang lebih baik
     permissionRequestDescription: {
-      "android.permission.READ_MEDIA_AUDIO": "Access to save audio files",
-      "android.permission.READ_MEDIA_VIDEO": "Access to save video files",
-      "android.permission.READ_EXTERNAL_STORAGE": "Access to save files",
-      "android.permission.WRITE_EXTERNAL_STORAGE": "Access to save files"
+      "android.permission.READ_MEDIA_AUDIO": "Akses untuk menyimpan file audio",
+      "android.permission.READ_MEDIA_VIDEO": "Akses untuk menyimpan file video",
+      "android.permission.READ_EXTERNAL_STORAGE": "Akses untuk menyimpan file",
+      "android.permission.WRITE_EXTERNAL_STORAGE": "Akses untuk menyimpan file"
     }
   }
 };

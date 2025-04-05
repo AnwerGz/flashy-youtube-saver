@@ -1,10 +1,10 @@
 
 import type { PluginListenerHandle } from '@capacitor/core';
 
-// Type definitions for Capacitor custom plugins
+// Definisi tipe untuk plugin kustom Capacitor
 declare module '@capacitor/core' {
   interface PluginsConfig {
-    // Define your plugin configurations here
+    // Definisi konfigurasi plugin Anda di sini
     YtDlpPlugin?: {
       binaryPath?: string;
     };
@@ -17,7 +17,7 @@ declare module '@capacitor/core' {
   }
 
   interface PermissionState {
-    // Permission states
+    // Status izin
     granted: 'granted';
     denied: 'denied';
     prompt: 'prompt';
@@ -25,10 +25,10 @@ declare module '@capacitor/core' {
   }
 
   interface PermissionType {
-    // Standard permission
+    // Izin standar
     storage: 'storage';
     
-    // Android 13+ permissions
+    // Izin Android 13+
     'android.permission.READ_MEDIA_AUDIO': 'android.permission.READ_MEDIA_AUDIO';
     'android.permission.READ_MEDIA_VIDEO': 'android.permission.READ_MEDIA_VIDEO';
     'android.permission.READ_MEDIA_IMAGES': 'android.permission.READ_MEDIA_IMAGES';
@@ -37,7 +37,7 @@ declare module '@capacitor/core' {
   }
 }
 
-// YT-DLP Plugin interface
+// Interface untuk Plugin YT-DLP
 interface YtDlpPluginPlugin {
   getVideoInfo(options: { url: string }): Promise<{ info: any }>;
   download(options: {
@@ -53,7 +53,7 @@ interface YtDlpPluginPlugin {
   ): Promise<PluginListenerHandle>;
 }
 
-// FFmpeg Plugin interface
+// Interface untuk Plugin FFmpeg
 interface FFmpegPluginPlugin {
   convert(options: {
     inputPath: string;
@@ -67,7 +67,7 @@ interface FFmpegPluginPlugin {
   ): Promise<PluginListenerHandle>;
 }
 
-// Shell Plugin interface
+// Interface untuk Plugin Shell
 interface ShellPlugin {
   execute(options: {
     command: string;
@@ -78,7 +78,7 @@ interface ShellPlugin {
   }>;
 }
 
-// Filesystem Plugin interface
+// Interface untuk Plugin Filesystem
 interface FilesystemPlugin {
   mkdir(options: {
     path: string;
@@ -111,7 +111,7 @@ interface FilesystemPlugin {
   }>;
 }
 
-// Permissions Plugin interface
+// Interface untuk Plugin Permissions
 interface PermissionsPlugin {
   query(options: {
     name: string;
@@ -129,7 +129,7 @@ interface PermissionsPlugin {
   }>;
 }
 
-// Add custom plugin declarations to the module
+// Menambahkan deklarasi plugin kustom ke dalam modul
 declare module '@capacitor/core' {
   interface RegisteredPlugins {
     YtDlpPlugin: YtDlpPluginPlugin;
