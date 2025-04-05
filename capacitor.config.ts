@@ -7,7 +7,13 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   plugins: {
     Permissions: {
-      requestPermissions: ['storage']
+      requestPermissions: [
+        'storage',
+        'android.permission.READ_MEDIA_AUDIO',
+        'android.permission.READ_MEDIA_VIDEO',
+        'android.permission.READ_EXTERNAL_STORAGE',
+        'android.permission.WRITE_EXTERNAL_STORAGE'
+      ]
     },
     YtDlpPlugin: {
       // YT-DLP binary path (will be auto-detected by the native plugin)

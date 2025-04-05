@@ -11,7 +11,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ExportGuide from "./pages/ExportGuide";
 import LogHistory from "./pages/LogHistory";
-import { initializeDefaultDirectories } from "./utils/ytdlp";
+import { initializeDefaultDirectories, initializeBinaries } from "./utils/ytdlp";
 import { useLogHistory } from "./pages/LogHistory";
 
 const queryClient = new QueryClient({
@@ -29,16 +29,17 @@ const queryClient = new QueryClient({
 const AppContent = () => {
   const { addLog } = useLogHistory();
   
-  // Initialize default directories when app starts
+  // Initialize default directories and binaries when app starts
   useEffect(() => {
     const initialize = async () => {
       try {
         await initializeDefaultDirectories();
+        await initializeBinaries();
       } catch (error) {
         // Don't show the Capacitor Plugin error to the user
         // Just log it for debugging purposes
-        addLog("Storage initialization: Using browser storage instead of native storage.", 'info');
-        console.log("Storage initialization: Using browser storage. Native storage may not be available in this environment.");
+        addLog("Initialization: Using browser storage instead of native storage.", 'info');
+        console.log("Initialization: Using browser storage. Native storage may not be available in this environment.");
       }
     };
     

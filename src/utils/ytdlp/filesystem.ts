@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core';
 export const createDirectory = async (path: string): Promise<boolean> => {
   if (isCapacitorNative()) {
     try {
-      if (!Capacitor.isPluginAvailable('Filesystem')) {
+      if (!Capacitor.Plugins.Filesystem) {
         addToLogHistory("Filesystem plugin not available. Using demo mode.", "warning");
         return true; // Return true in demo mode
       }
@@ -55,7 +55,7 @@ export const createDirectory = async (path: string): Promise<boolean> => {
 export const listDirectories = async (): Promise<string[]> => {
   if (isCapacitorNative()) {
     try {
-      if (!Capacitor.isPluginAvailable('Filesystem')) {
+      if (!Capacitor.Plugins.Filesystem) {
         addToLogHistory("Filesystem plugin not available. Using demo mode.", "warning");
         return ["Downloads", "Movies", "Music"]; // Return demo directories
       }
