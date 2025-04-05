@@ -24,7 +24,7 @@ export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
           throw new Error("YtDlpPlugin not available");
         }
         
-        const YtDlpPlugin = registerPlugin('YtDlpPlugin');
+        const YtDlpPlugin = registerPlugin<YtDlpPluginPlugin>('YtDlpPlugin');
         addToLogHistory("Calling native YT-DLP plugin for video info", "info");
         
         const result = await YtDlpPlugin.getVideoInfo({ url });
@@ -104,7 +104,7 @@ export const downloadVideo = async (
           addToLogHistory(`Error creating directory: ${(err as Error).message}. Will attempt to continue.`, "warning");
         }
         
-        const YtDlpPlugin = registerPlugin('YtDlpPlugin');
+        const YtDlpPlugin = registerPlugin<YtDlpPluginPlugin>('YtDlpPlugin');
         
         // Get filename from info if possible
         try {

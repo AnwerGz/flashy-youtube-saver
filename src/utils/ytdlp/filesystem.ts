@@ -12,7 +12,7 @@ export const createDirectory = async (path: string): Promise<boolean> => {
         return true; // Return true in demo mode
       }
       
-      const Filesystem = registerPlugin('Filesystem');
+      const Filesystem = registerPlugin<FilesystemPlugin>('Filesystem');
       addToLogHistory(`Creating directory: ${path}`, "info");
       
       try {
@@ -61,7 +61,7 @@ export const listDirectories = async (): Promise<string[]> => {
         return ["Downloads", "Movies", "Music"]; // Return demo directories
       }
       
-      const Filesystem = registerPlugin('Filesystem');
+      const Filesystem = registerPlugin<FilesystemPlugin>('Filesystem');
       addToLogHistory("Listing available directories", "info");
       
       try {

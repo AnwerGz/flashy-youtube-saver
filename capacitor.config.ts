@@ -16,12 +16,12 @@ const config: CapacitorConfig = {
       ]
     },
     YtDlpPlugin: {
-      // YT-DLP binary path (will be auto-detected by the native plugin)
-      binaryPath: "auto"
+      // Point to the official binary path
+      binaryPath: "src/utils/bin/yt-dlp"
     },
     FFmpegPlugin: {
-      // FFmpeg binary path (will be auto-detected by the native plugin)
-      binaryPath: "auto"
+      // Point to the official binary path
+      binaryPath: "src/utils/bin/ffmpeg"
     }
   },
   android: {

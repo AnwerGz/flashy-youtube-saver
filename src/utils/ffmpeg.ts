@@ -41,7 +41,7 @@ export const convertMedia = async (
       }
       
       // In a real app with the plugin registered
-      const FFmpegPlugin = registerPlugin('FFmpegPlugin');
+      const FFmpegPlugin = registerPlugin<FFmpegPluginPlugin>('FFmpegPlugin');
       
       // Subscribe to conversion progress
       const handle = await FFmpegPlugin.addListener('conversionProgress', (data: { progress: number }) => {

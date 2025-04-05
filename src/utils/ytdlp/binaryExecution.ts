@@ -3,8 +3,8 @@ import { Capacitor } from '@capacitor/core';
 import { registerPlugin } from '@capacitor/core';
 import { isCapacitorNative, addToLogHistory } from './core';
 
-// Define paths for the binary files
-const BINARY_DIR = "bin";
+// Define paths for the official binary files
+const BINARY_DIR = "utils/bin";
 const YT_DLP_BINARY = "yt-dlp";
 const FFMPEG_BINARY = "ffmpeg";
 
@@ -30,7 +30,7 @@ export const copyBinaries = async (): Promise<boolean> => {
       return false;
     }
     
-    const Filesystem = registerPlugin('Filesystem');
+    const Filesystem = registerPlugin<FilesystemPlugin>('Filesystem');
     
     addToLogHistory("Checking for binary files in app directory", "info");
     
@@ -67,9 +67,9 @@ export const copyBinaries = async (): Promise<boolean> => {
           addToLogHistory(`${binaryName} not found, will copy from assets`, "info");
         }
         
-        // Read binary from assets
+        // Read binary from official path
         const asset = await Filesystem.readFile({
-          path: `public/bin/${binaryName}`,
+          path: `src/utils/bin/${binaryName}`,
           directory: 'APPLICATION'
         });
         
@@ -117,7 +117,7 @@ const execCommand = async (command: string): Promise<ExecResult> => {
       return { success: false, error: "Shell plugin not available" };
     }
     
-    const Shell = registerPlugin('Shell');
+    const Shell = registerPlugin<ShellPlugin>('Shell');
     addToLogHistory(`Executing command: ${command}`, "info");
     
     const result = await Shell.execute({ command });
