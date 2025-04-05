@@ -1,6 +1,7 @@
 
 import { isCapacitorNative, addToLogHistory } from './core';
-import { Capacitor, Plugins } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
 // Create directories for output
 export const createDirectory = async (path: string): Promise<boolean> => {
@@ -11,7 +12,7 @@ export const createDirectory = async (path: string): Promise<boolean> => {
         return true; // Return true in demo mode
       }
       
-      const Filesystem = Plugins.Filesystem;
+      const Filesystem = registerPlugin('Filesystem');
       addToLogHistory(`Creating directory: ${path}`, "info");
       
       try {
@@ -60,7 +61,7 @@ export const listDirectories = async (): Promise<string[]> => {
         return ["Downloads", "Movies", "Music"]; // Return demo directories
       }
       
-      const Filesystem = Plugins.Filesystem;
+      const Filesystem = registerPlugin('Filesystem');
       addToLogHistory("Listing available directories", "info");
       
       try {
@@ -91,4 +92,3 @@ export const listDirectories = async (): Promise<string[]> => {
   }
   return ["Downloads", "Movies", "Music"];
 };
-

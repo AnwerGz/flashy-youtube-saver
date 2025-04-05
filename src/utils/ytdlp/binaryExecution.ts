@@ -1,5 +1,6 @@
 
-import { Capacitor, Plugins } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 import { isCapacitorNative, addToLogHistory } from './core';
 
 // Define paths for the binary files
@@ -29,7 +30,7 @@ export const copyBinaries = async (): Promise<boolean> => {
       return false;
     }
     
-    const Filesystem = Plugins.Filesystem;
+    const Filesystem = registerPlugin('Filesystem');
     
     addToLogHistory("Checking for binary files in app directory", "info");
     
@@ -111,12 +112,12 @@ const execCommand = async (command: string): Promise<ExecResult> => {
   
   try {
     // Check if we have a Shell plugin available
-    if (!Capacitor.isPluginAvailable('Shell') && !Capacitor.Plugins.Shell) {
+    if (!Capacitor.isPluginAvailable('Shell')) {
       addToLogHistory("Shell plugin not available", "error");
       return { success: false, error: "Shell plugin not available" };
     }
     
-    const Shell = Plugins.Shell;
+    const Shell = registerPlugin('Shell');
     addToLogHistory(`Executing command: ${command}`, "info");
     
     const result = await Shell.execute({ command });
@@ -180,4 +181,3 @@ export const execFFmpeg = async (args: string[]): Promise<ExecResult> => {
     return { success: false, error: (error as Error).message };
   }
 };
-

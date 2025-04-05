@@ -1,6 +1,6 @@
 
-import { toast } from "sonner";
-import { Capacitor, Plugins } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
 // Check if we're running in a Capacitor environment
 export const isCapacitorNative = (): boolean => {
@@ -37,7 +37,6 @@ export const loadYtDlp = async (): Promise<boolean> => {
       if (!Capacitor.isPluginAvailable('YtDlpPlugin')) {
         console.log("YtDlpPlugin not available, running in demo mode");
         addToLogHistory("YtDlp plugin not detected. Running in demo mode.", "warning");
-        toast.warning("Running in demo mode");
         return false;
       }
       
@@ -45,15 +44,12 @@ export const loadYtDlp = async (): Promise<boolean> => {
     } else {
       // Browser environment - not fully supported
       console.log("Running in browser environment");
-      toast.warning("Full functionality requires the mobile app");
       addToLogHistory("Running in browser environment. Full functionality requires the mobile app", "warning");
       return false;
     }
   } catch (error) {
     console.error("Failed to load yt-dlp:", error);
-    toast.error("Failed to initialize download engine");
     addToLogHistory("Failed to initialize download engine: " + (error as Error).message, "error");
     return false;
   }
 };
-

@@ -5,7 +5,8 @@ import { getDemoVideoInfo, simulateDownload } from './demo';
 import { toast } from 'sonner';
 import { createDirectory } from './filesystem';
 import { requestStoragePermission } from './permissions';
-import { Capacitor, Plugins } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
 // Extract video information using yt-dlp
 export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
@@ -23,7 +24,7 @@ export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
           throw new Error("YtDlpPlugin not available");
         }
         
-        const YtDlpPlugin = Plugins.YtDlpPlugin;
+        const YtDlpPlugin = registerPlugin('YtDlpPlugin');
         addToLogHistory("Calling native YT-DLP plugin for video info", "info");
         
         const result = await YtDlpPlugin.getVideoInfo({ url });
@@ -103,7 +104,7 @@ export const downloadVideo = async (
           addToLogHistory(`Error creating directory: ${(err as Error).message}. Will attempt to continue.`, "warning");
         }
         
-        const YtDlpPlugin = Plugins.YtDlpPlugin;
+        const YtDlpPlugin = registerPlugin('YtDlpPlugin');
         
         // Get filename from info if possible
         try {
@@ -162,9 +163,8 @@ export const downloadVideo = async (
           
           if (result.success) {
             const filePath = `${finalOutputPath}/${filename}${isAudio ? '.mp3' : '.mp4'}`;
-            addToLogHistory(`Download completed at ${formattedEndTime} (took ${duration} seconds)`, "success");
+            addToLogHistory(`Download completed at ${formattedEndTime} (took ${duration}s)`, "success");
             addToLogHistory(`File saved to: ${filePath}`, "success");
-            toast.success(`Download completed! File saved to: ${filePath}`);
             return true;
           } else {
             addToLogHistory(`Download failed at ${formattedEndTime}`, "error");
@@ -206,4 +206,3 @@ export const downloadVideo = async (
     return false;
   }
 };
-

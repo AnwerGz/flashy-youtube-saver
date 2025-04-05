@@ -1,7 +1,8 @@
 
 import { isCapacitorNative, addToLogHistory } from './core';
 import { toast } from 'sonner';
-import { Capacitor, Plugins } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
 // Request storage permission for Android
 export const requestStoragePermission = async (): Promise<boolean> => {
@@ -9,7 +10,7 @@ export const requestStoragePermission = async (): Promise<boolean> => {
     try {
       addToLogHistory("Requesting storage permissions", "info");
       
-      // Check if we can access Permissions through Capacitor.Plugins
+      // Check if we can access Permissions through Capacitor
       if (!Capacitor.isPluginAvailable('Permissions')) {
         addToLogHistory("Permissions plugin not available. Using demo mode.", "warning");
         return true; // Return true in demo mode
@@ -19,14 +20,13 @@ export const requestStoragePermission = async (): Promise<boolean> => {
       let isAndroid13Plus = false;
       
       try {
-        const deviceInfo = await Capacitor.getPlatform();
-        const androidVersion = deviceInfo === 'android' ? 
-          (await Capacitor.getPlatform() === 'android' ? '13' : '0') : '0'; // Simplified version detection
+        const deviceInfo = Capacitor.getPlatform();
+        const androidVersion = deviceInfo === 'android' ? '13' : '0'; // Simplified version detection
         isAndroid13Plus = parseInt(androidVersion) >= 13; // Android 13+
         
-        addToLogHistory(`Detected Android version: ${androidVersion}`, "info");
+        addToLogHistory(`Detected platform: ${deviceInfo}`, "info");
       } catch (err) {
-        addToLogHistory("Could not detect Android version, using legacy permission model", "warning");
+        addToLogHistory("Could not detect device platform, using legacy permission model", "warning");
       }
       
       let permissionResult;
@@ -36,7 +36,8 @@ export const requestStoragePermission = async (): Promise<boolean> => {
         addToLogHistory("Requesting Android 13+ specific media permissions", "info");
         
         try {
-          const Permissions = Plugins.Permissions;
+          // Use dynamic plugin import when needed
+          const Permissions = registerPlugin('Permissions');
           permissionResult = await Permissions.query({
             name: 'android.permission.READ_MEDIA_AUDIO' as any
           });
@@ -72,7 +73,7 @@ export const requestStoragePermission = async (): Promise<boolean> => {
           
           // Fall back to legacy permission
           try {
-            const Permissions = Plugins.Permissions;
+            const Permissions = registerPlugin('Permissions');
             permissionResult = await Permissions.query({ name: 'storage' });
             
             if (permissionResult.state !== 'granted') {
@@ -95,7 +96,7 @@ export const requestStoragePermission = async (): Promise<boolean> => {
         addToLogHistory("Requesting standard storage permission", "info");
         
         try {
-          const Permissions = Plugins.Permissions;
+          const Permissions = registerPlugin('Permissions');
           permissionResult = await Permissions.query({ name: 'storage' });
           
           if (permissionResult.state !== 'granted') {
@@ -124,4 +125,3 @@ export const requestStoragePermission = async (): Promise<boolean> => {
   addToLogHistory("Browser environment, assuming storage permission granted", "info");
   return true;
 };
-
