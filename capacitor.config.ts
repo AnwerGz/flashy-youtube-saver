@@ -2,8 +2,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.8d37f687d2ea4dae993038530fe6ba3d',
-  appName: 'flashy-youtube-saver',
+  appId: 'com.dejavi.flash',
+  appName: 'Flash YTConverter',
   webDir: 'dist',
   plugins: {
     Permissions: {
