@@ -1,7 +1,7 @@
 
 import { isCapacitorNative, addToLogHistory } from './core';
 import { toast } from 'sonner';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, Plugins } from '@capacitor/core';
 
 // Request storage permission for Android
 export const requestStoragePermission = async (): Promise<boolean> => {
@@ -10,7 +10,7 @@ export const requestStoragePermission = async (): Promise<boolean> => {
       addToLogHistory("Requesting storage permissions", "info");
       
       // Check if we can access Permissions through Capacitor.Plugins
-      if (!Capacitor.Plugins.Permissions) {
+      if (!Capacitor.isPluginAvailable('Permissions')) {
         addToLogHistory("Permissions plugin not available. Using demo mode.", "warning");
         return true; // Return true in demo mode
       }
@@ -20,10 +20,11 @@ export const requestStoragePermission = async (): Promise<boolean> => {
       
       try {
         const deviceInfo = await Capacitor.getPlatform();
-        const androidVersion = Capacitor.getPlatformInfo().then(info => info.osVersion);
-        isAndroid13Plus = parseInt(await androidVersion) >= 13; // Android 13+
+        const androidVersion = deviceInfo === 'android' ? 
+          (await Capacitor.getPlatform() === 'android' ? '13' : '0') : '0'; // Simplified version detection
+        isAndroid13Plus = parseInt(androidVersion) >= 13; // Android 13+
         
-        addToLogHistory(`Detected Android version: ${await androidVersion}`, "info");
+        addToLogHistory(`Detected Android version: ${androidVersion}`, "info");
       } catch (err) {
         addToLogHistory("Could not detect Android version, using legacy permission model", "warning");
       }
@@ -35,18 +36,19 @@ export const requestStoragePermission = async (): Promise<boolean> => {
         addToLogHistory("Requesting Android 13+ specific media permissions", "info");
         
         try {
-          permissionResult = await Capacitor.Plugins.Permissions.query({
+          const Permissions = Plugins.Permissions;
+          permissionResult = await Permissions.query({
             name: 'android.permission.READ_MEDIA_AUDIO' as any
           });
           const audioResult = permissionResult.state === 'granted';
           
-          permissionResult = await Capacitor.Plugins.Permissions.query({
+          permissionResult = await Permissions.query({
             name: 'android.permission.READ_MEDIA_VIDEO' as any
           });
           const videoResult = permissionResult.state === 'granted';
           
           if (!audioResult || !videoResult) {
-            const results = await Capacitor.Plugins.Permissions.requestPermissions({
+            const results = await Permissions.requestPermissions({
               permissions: [
                 'android.permission.READ_MEDIA_AUDIO',
                 'android.permission.READ_MEDIA_VIDEO'
@@ -70,10 +72,11 @@ export const requestStoragePermission = async (): Promise<boolean> => {
           
           // Fall back to legacy permission
           try {
-            permissionResult = await Capacitor.Plugins.Permissions.query({ name: 'storage' });
+            const Permissions = Plugins.Permissions;
+            permissionResult = await Permissions.query({ name: 'storage' });
             
             if (permissionResult.state !== 'granted') {
-              const result = await Capacitor.Plugins.Permissions.requestPermissions({ permissions: ['storage'] });
+              const result = await Permissions.requestPermissions({ permissions: ['storage'] });
               const granted = result.permissions.storage.state === 'granted';
               
               addToLogHistory(`Fallback storage permission result: ${granted ? "granted" : "denied"}`, 
@@ -92,10 +95,11 @@ export const requestStoragePermission = async (): Promise<boolean> => {
         addToLogHistory("Requesting standard storage permission", "info");
         
         try {
-          permissionResult = await Capacitor.Plugins.Permissions.query({ name: 'storage' });
+          const Permissions = Plugins.Permissions;
+          permissionResult = await Permissions.query({ name: 'storage' });
           
           if (permissionResult.state !== 'granted') {
-            const result = await Capacitor.Plugins.Permissions.requestPermissions({ permissions: ['storage'] });
+            const result = await Permissions.requestPermissions({ permissions: ['storage'] });
             const granted = result.permissions.storage.state === 'granted';
             
             addToLogHistory(`Storage permission request result: ${granted ? "granted" : "denied"}`, 
@@ -120,3 +124,4 @@ export const requestStoragePermission = async (): Promise<boolean> => {
   addToLogHistory("Browser environment, assuming storage permission granted", "info");
   return true;
 };
+

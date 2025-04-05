@@ -1,6 +1,6 @@
 
 import { toast } from "sonner";
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, Plugins } from '@capacitor/core';
 
 // Check if we're running in a Capacitor environment
 export const isCapacitorNative = (): boolean => {
@@ -34,7 +34,7 @@ export const loadYtDlp = async (): Promise<boolean> => {
       console.log("Running in Capacitor environment");
       
       // Check if the plugin is registered
-      if (!Capacitor.Plugins.YtDlpPlugin) {
+      if (!Capacitor.isPluginAvailable('YtDlpPlugin')) {
         console.log("YtDlpPlugin not available, running in demo mode");
         addToLogHistory("YtDlp plugin not detected. Running in demo mode.", "warning");
         toast.warning("Running in demo mode");
@@ -56,3 +56,4 @@ export const loadYtDlp = async (): Promise<boolean> => {
     return false;
   }
 };
+

@@ -1,7 +1,7 @@
 
 import { toast } from "sonner";
 import { requestStoragePermission } from "./ytdlp"; 
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, Plugins } from '@capacitor/core';
 
 // Check if we're running in a Capacitor environment
 const isCapacitorNative = (): boolean => {
@@ -40,7 +40,7 @@ export const convertMedia = async (
       }
       
       // In a real app with the plugin registered
-      const { FFmpegPlugin } = Capacitor.Plugins;
+      const FFmpegPlugin = Plugins.FFmpegPlugin;
       
       // Subscribe to conversion progress
       const handle = await FFmpegPlugin.addListener('conversionProgress', (data: { progress: number }) => {
@@ -91,3 +91,4 @@ export const checkFFmpegAvailability = async (): Promise<boolean> => {
   // In browser, we'll assume it's not available
   return false;
 };
+

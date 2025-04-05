@@ -5,7 +5,7 @@ import { getDemoVideoInfo, simulateDownload } from './demo';
 import { toast } from 'sonner';
 import { createDirectory } from './filesystem';
 import { requestStoragePermission } from './permissions';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, Plugins } from '@capacitor/core';
 
 // Extract video information using yt-dlp
 export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
@@ -19,11 +19,11 @@ export const getVideoInfo = async (url: string): Promise<VideoInfo | null> => {
     } else if (isCapacitorNative()) {
       try {
         // Call the native YT-DLP plugin
-        if (!Capacitor.Plugins.YtDlpPlugin) {
+        if (!Capacitor.isPluginAvailable('YtDlpPlugin')) {
           throw new Error("YtDlpPlugin not available");
         }
         
-        const { YtDlpPlugin } = Capacitor.Plugins;
+        const YtDlpPlugin = Plugins.YtDlpPlugin;
         addToLogHistory("Calling native YT-DLP plugin for video info", "info");
         
         const result = await YtDlpPlugin.getVideoInfo({ url });
@@ -103,7 +103,7 @@ export const downloadVideo = async (
           addToLogHistory(`Error creating directory: ${(err as Error).message}. Will attempt to continue.`, "warning");
         }
         
-        const { YtDlpPlugin } = Capacitor.Plugins;
+        const YtDlpPlugin = Plugins.YtDlpPlugin;
         
         // Get filename from info if possible
         try {
@@ -206,3 +206,4 @@ export const downloadVideo = async (
     return false;
   }
 };
+

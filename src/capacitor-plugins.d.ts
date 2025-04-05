@@ -11,7 +11,21 @@ interface PermissionStatus {
   [key: string]: PermissionState;
 }
 
+// Import the required Capacitor types
 declare module '@capacitor/core' {
+  interface PluginsConfig {
+    // Define your plugin configurations here
+    YtDlpPlugin?: {
+      binaryPath?: string;
+    };
+    FFmpegPlugin?: {
+      binaryPath?: string;
+    };
+    Permissions?: {
+      requestPermissions?: string[];
+    };
+  }
+
   interface PermissionType {
     // Standard permission
     storage: PermissionState;
@@ -27,6 +41,9 @@ declare module '@capacitor/core' {
   interface PluginRegistry {
     YtDlpPlugin: YtDlpPluginPlugin;
     FFmpegPlugin: FFmpegPluginPlugin;
+    Filesystem: FilesystemPlugin;
+    Permissions: PermissionsPlugin;
+    Shell: ShellPlugin;
   }
 }
 
@@ -59,3 +76,66 @@ interface FFmpegPluginPlugin {
     listenerFunc: (data: { progress: number }) => void
   ): Promise<PluginListenerHandle>;
 }
+
+// Shell Plugin interface
+interface ShellPlugin {
+  execute(options: {
+    command: string
+  }): Promise<{
+    output: string,
+    error?: string,
+    exitCode: number
+  }>;
+}
+
+// Filesystem Plugin interface
+interface FilesystemPlugin {
+  mkdir(options: {
+    path: string,
+    directory?: string,
+    recursive?: boolean
+  }): Promise<void>;
+  readdir(options: {
+    path: string,
+    directory?: string
+  }): Promise<{ files: string[] }>;
+  readFile(options: {
+    path: string,
+    directory?: string,
+    encoding?: string
+  }): Promise<{ data: string }>;
+  writeFile(options: {
+    path: string,
+    data: string,
+    directory?: string,
+    encoding?: string
+  }): Promise<void>;
+  stat(options: {
+    path: string,
+    directory?: string
+  }): Promise<{
+    type: string,
+    size: number,
+    mtime: number,
+    uri: string
+  }>;
+}
+
+// Permissions Plugin interface
+interface PermissionsPlugin {
+  query(options: {
+    name: string
+  }): Promise<{
+    state: PermissionState
+  }>;
+  requestPermissions(options: {
+    permissions: string[]
+  }): Promise<{
+    permissions: {
+      [key: string]: {
+        state: PermissionState
+      }
+    }
+  }>;
+}
+
