@@ -1,4 +1,3 @@
-
 // Re-export all functions from the modules
 export * from './types';
 export * from './core';
@@ -14,6 +13,7 @@ import { isCapacitorNative, addToLogHistory } from './core';
 import { requestStoragePermission } from './permissions';
 import { createDirectory } from './filesystem';
 import { copyBinaries } from './binaryExecution';
+import { initializeBinaries } from '../binaryInstaller';
 
 export const initializeDefaultDirectories = async (): Promise<void> => {
   if (isCapacitorNative()) {
@@ -44,10 +44,12 @@ export const initializeDefaultDirectories = async (): Promise<void> => {
   }
 };
 
-export const initializeBinaries = async (): Promise<void> => {
+export const initializeBinariesFromAssets = async (): Promise<void> => {
   try {
     addToLogHistory("Initializing binary files", "info");
-    const success = await copyBinaries();
+    
+    // Use the new binary installer plugin
+    const success = await initializeBinaries();
     
     if (success) {
       addToLogHistory("Binary files successfully initialized", "success");
@@ -58,4 +60,9 @@ export const initializeBinaries = async (): Promise<void> => {
     console.error("Error initializing binary files:", error);
     addToLogHistory("Error initializing binary files: " + (error as Error).message, "error");
   }
+};
+
+// Keep original function for backward compatibility
+export const initializeBinaries = async (): Promise<void> => {
+  return initializeBinariesFromAssets();
 };

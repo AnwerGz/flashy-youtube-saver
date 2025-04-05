@@ -14,6 +14,12 @@ declare module '@capacitor/core' {
     Permissions?: {
       requestPermissions?: string[];
     };
+    BinaryInstaller?: {
+      sourcePaths?: {
+        ytdlp: string;
+        ffmpeg: string;
+      };
+    };
   }
 
   interface PermissionState {
@@ -129,6 +135,12 @@ interface PermissionsPlugin {
   }>;
 }
 
+// Interface untuk Binary Installer Plugin
+interface BinaryInstallerPlugin {
+  copyBinaries(): Promise<{ success: boolean; message?: string }>;
+  isInstalled(): Promise<{ installed: boolean }>;
+}
+
 // Menambahkan deklarasi plugin kustom ke dalam modul
 declare module '@capacitor/core' {
   interface RegisteredPlugins {
@@ -137,5 +149,6 @@ declare module '@capacitor/core' {
     Shell: ShellPlugin;
     Filesystem: FilesystemPlugin;
     Permissions: PermissionsPlugin;
+    BinaryInstaller: BinaryInstallerPlugin;
   }
 }

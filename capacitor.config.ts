@@ -28,6 +28,13 @@ const config: CapacitorConfig = {
     FFmpegPlugin: {
       // Point to the correct relative path to binaries in the app's assets
       binaryPath: "assets/bin/ffmpeg"
+    },
+    BinaryInstaller: {
+      // Source paths in assets
+      sourcePaths: {
+        ytdlp: "public/assets/utils/bin/yt-dlp",
+        ffmpeg: "public/assets/utils/bin/ffmpeg"
+      }
     }
   },
   android: {

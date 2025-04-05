@@ -24,77 +24,95 @@ export const copyBinaries = async (): Promise<boolean> => {
   }
   
   try {
-    if (!Capacitor.isPluginAvailable('Filesystem')) {
-      addToLogHistory("Filesystem plugin not available", "warning");
-      return false;
-    }
-    
-    const Filesystem = registerPlugin<FilesystemPlugin>('Filesystem');
-    
-    addToLogHistory("Checking binary files in app directory", "info");
-    
-    // Create destination directory
-    try {
-      await Filesystem.mkdir({
-        path: BINARY_DIR,
-        directory: 'APPLICATION',
-        recursive: true
-      });
-    } catch (err) {
-      // Ignore error if directory already exists
-      addToLogHistory("Binary directory already exists or couldn't be created", "info");
-    }
-    
-    // Function to copy binary from assets to app directory
-    const copyBinary = async (binaryName: string): Promise<boolean> => {
+    if (!Capacitor.isPluginAvailable('BinaryInstaller')) {
+      addToLogHistory("BinaryInstaller plugin not available, falling back to Filesystem plugin", "warning");
+      
+      if (!Capacitor.isPluginAvailable('Filesystem')) {
+        addToLogHistory("Filesystem plugin not available", "warning");
+        return false;
+      }
+      
+      const Filesystem = registerPlugin<FilesystemPlugin>('Filesystem');
+      
+      addToLogHistory("Checking binary files in app directory", "info");
+      
+      // Create destination directory
       try {
-        // Check if binary already exists in app directory
+        await Filesystem.mkdir({
+          path: BINARY_DIR,
+          directory: 'APPLICATION',
+          recursive: true
+        });
+      } catch (err) {
+        // Ignore error if directory already exists
+        addToLogHistory("Binary directory already exists or couldn't be created", "info");
+      }
+      
+      // Function to copy binary from assets to app directory
+      const copyBinary = async (binaryName: string): Promise<boolean> => {
         try {
-          const stat = await Filesystem.stat({
-            path: `${BINARY_DIR}/${binaryName}`,
+          // Check if binary already exists in app directory
+          try {
+            const stat = await Filesystem.stat({
+              path: `${BINARY_DIR}/${binaryName}`,
+              directory: 'APPLICATION'
+            });
+            
+            if (stat) {
+              addToLogHistory(`${binaryName} already exists in app directory`, "info");
+              // Set execution permissions
+              await execCommand(`chmod +x ${BINARY_DIR}/${binaryName}`);
+              return true;
+            }
+          } catch (statErr) {
+            // File doesn't exist, we need to copy it
+            addToLogHistory(`${binaryName} not found, will copy from assets`, "info");
+          }
+          
+          // Read binary from official path
+          const asset = await Filesystem.readFile({
+            path: `src/utils/bin/${binaryName}`,
             directory: 'APPLICATION'
           });
           
-          if (stat) {
-            addToLogHistory(`${binaryName} already exists in app directory`, "info");
-            // Set execution permissions
-            await execCommand(`chmod +x ${BINARY_DIR}/${binaryName}`);
-            return true;
-          }
-        } catch (statErr) {
-          // File doesn't exist, we need to copy it
-          addToLogHistory(`${binaryName} not found, will copy from assets`, "info");
+          // Write binary to app directory
+          await Filesystem.writeFile({
+            path: `${BINARY_DIR}/${binaryName}`,
+            data: asset.data,
+            directory: 'APPLICATION'
+          });
+          
+          // Set execution permissions
+          await execCommand(`chmod +x ${BINARY_DIR}/${binaryName}`);
+          
+          addToLogHistory(`Successfully copied ${binaryName} to app directory`, "success");
+          return true;
+        } catch (err) {
+          addToLogHistory(`Failed to copy ${binaryName}: ${(err as Error).message}`, "error");
+          return false;
         }
-        
-        // Read binary from official path
-        const asset = await Filesystem.readFile({
-          path: `src/utils/bin/${binaryName}`,
-          directory: 'APPLICATION'
-        });
-        
-        // Write binary to app directory
-        await Filesystem.writeFile({
-          path: `${BINARY_DIR}/${binaryName}`,
-          data: asset.data,
-          directory: 'APPLICATION'
-        });
-        
-        // Set execution permissions
-        await execCommand(`chmod +x ${BINARY_DIR}/${binaryName}`);
-        
-        addToLogHistory(`Successfully copied ${binaryName} to app directory`, "success");
-        return true;
-      } catch (err) {
-        addToLogHistory(`Failed to copy ${binaryName}: ${(err as Error).message}`, "error");
-        return false;
-      }
-    };
+      };
+      
+      // Copy both binaries
+      const ytDlpCopied = await copyBinary(YT_DLP_BINARY);
+      const ffmpegCopied = await copyBinary(FFMPEG_BINARY);
+      
+      return ytDlpCopied && ffmpegCopied;
+    }
     
-    // Copy both binaries
-    const ytDlpCopied = await copyBinary(YT_DLP_BINARY);
-    const ffmpegCopied = await copyBinary(FFMPEG_BINARY);
+    // Use the dedicated BinaryInstaller plugin
+    const BinaryInstaller = registerPlugin<BinaryInstallerPlugin>('BinaryInstaller');
+    addToLogHistory("Using BinaryInstaller plugin to copy binaries", "info");
     
-    return ytDlpCopied && ffmpegCopied;
+    const result = await BinaryInstaller.copyBinaries();
+    
+    if (result.success) {
+      addToLogHistory("Binary files successfully copied with BinaryInstaller", "success");
+      return true;
+    } else {
+      addToLogHistory(`Failed to copy binaries with BinaryInstaller: ${result.message}`, "error");
+      return false;
+    }
   } catch (error) {
     addToLogHistory(`Failed to copy binaries: ${(error as Error).message}`, "error");
     return false;
