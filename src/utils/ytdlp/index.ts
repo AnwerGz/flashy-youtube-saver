@@ -6,6 +6,8 @@ export * from './permissions';
 export * from './filesystem';
 export * from './videoOperations';
 export * from './binaryExecution';
+export * from './videoInfo';
+export * from './videoDownload';
 
 // Initialize default directories when the app is first opened
 import { isCapacitorNative, addToLogHistory } from './core';
